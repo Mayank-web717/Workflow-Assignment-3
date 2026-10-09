@@ -1,0 +1,776 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+             xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+             xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+             xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+             targetNamespace="http://bpmn.io/schema/bpmn"
+             exporter="BPMN Assignment Generator"
+             exporterVersion="1.0">
+
+  <!-- ============================================================ -->
+  <!-- ASSIGNMENT 3: Loan Origination and Approval System          -->
+  <!-- ============================================================ -->
+
+  <collaboration id="Collaboration_Assignment3">
+    <!-- Main Bank Pool -->
+    <participant id="Pool_Bank" name="Loan Origination and Approval System" processRef="Process_Loan" />
+    <!-- External Credit Bureau Pool -->
+    <participant id="Pool_CreditBureau" name="Credit Bureau (External)" processRef="Process_CreditBureau" />
+    <!-- Message flow between bank and credit bureau -->
+    <messageFlow id="MF_LoanToCredit" name="Credit Report Request" sourceRef="Task_RequestCreditBureau" targetRef="Pool_CreditBureau" />
+    <messageFlow id="MF_CreditToLoan" name="Credit Report Response" sourceRef="Pool_CreditBureau" targetRef="IntermediateCatch_CreditReport" />
+  </collaboration>
+
+  <!-- ========== EXTERNAL: Credit Bureau Process ========== -->
+  <process id="Process_CreditBureau" name="Credit Bureau" isExecutable="false">
+    <startEvent id="SubStart_CB" name="Receive Credit Report Request">
+      <outgoing>SF_CB_Start_Process</outgoing>
+      <messageEventDefinition id="MsgDef_CB_Request" messageRef="Msg_CreditRequest" />
+    </startEvent>
+    <serviceTask id="Task_CB_GenerateReport" name="Generate Credit Report">
+      <incoming>SF_CB_Start_Process</incoming>
+      <outgoing>SF_CB_Send</outgoing>
+    </serviceTask>
+    <endEvent id="SubEnd_CB" name="Send Credit Report">
+      <incoming>SF_CB_Send</incoming>
+      <messageEventDefinition id="MsgDef_CB_Response" messageRef="Msg_CreditReport" />
+    </endEvent>
+    <sequenceFlow id="SF_CB_Start_Process" sourceRef="SubStart_CB" targetRef="Task_CB_GenerateReport" />
+    <sequenceFlow id="SF_CB_Send" sourceRef="Task_CB_GenerateReport" targetRef="SubEnd_CB" />
+  </process>
+
+  <!-- ========== MAIN BANK PROCESS ========== -->
+  <process id="Process_Loan" name="Loan Origination and Approval System" isExecutable="true">
+
+    <laneSet id="LaneSet_Loan">
+      <lane id="Lane_Applicant" name="Applicant">
+        <flowNodeRef>StartEvent_ApplyLoan</flowNodeRef>
+        <flowNodeRef>Task_SubmitApplication</flowNodeRef>
+        <flowNodeRef>Task_CorrectDocuments</flowNodeRef>
+        <flowNodeRef>Task_ReviewOffer</flowNodeRef>
+        <flowNodeRef>GW_OfferDecision</flowNodeRef>
+        <flowNodeRef>Task_ESignAgreement</flowNodeRef>
+        <flowNodeRef>BoundaryTimer_OfferTimeout</flowNodeRef>
+        <flowNodeRef>BoundaryTimer_ESignTimeout</flowNodeRef>
+        <flowNodeRef>Task_WithdrawApplication</flowNodeRef>
+        <flowNodeRef>EndEvent_LoanDisbursed</flowNodeRef>
+        <flowNodeRef>EndEvent_Withdrawn</flowNodeRef>
+        <flowNodeRef>EndEvent_OfferExpired</flowNodeRef>
+      </lane>
+      <lane id="Lane_LoanOfficer" name="Loan Officer">
+        <flowNodeRef>Task_CheckDocCompleteness</flowNodeRef>
+        <flowNodeRef>GW_DocComplete</flowNodeRef>
+        <flowNodeRef>Task_ReturnIncomplete</flowNodeRef>
+        <flowNodeRef>Task_VerifyIncome</flowNodeRef>
+        <flowNodeRef>Task_CalculateEligibility</flowNodeRef>
+        <flowNodeRef>GW_EligibilityScore</flowNodeRef>
+        <flowNodeRef>Task_GenerateLoanOffer</flowNodeRef>
+        <flowNodeRef>Task_SendOffer</flowNodeRef>
+        <flowNodeRef>Task_CounterOffer</flowNodeRef>
+        <flowNodeRef>GW_CounterOfferDecision</flowNodeRef>
+        <flowNodeRef>Task_FinalizeAgreement</flowNodeRef>
+        <flowNodeRef>EndEvent_Rejected</flowNodeRef>
+        <flowNodeRef>EndEvent_ApplicationLapsed</flowNodeRef>
+      </lane>
+      <lane id="Lane_Underwriter" name="Underwriter / Credit Committee">
+        <flowNodeRef>Task_UnderwriterReview</flowNodeRef>
+        <flowNodeRef>GW_UnderwriterDecision</flowNodeRef>
+        <flowNodeRef>Task_RequestCollateral</flowNodeRef>
+        <flowNodeRef>GW_CollateralOK</flowNodeRef>
+        <flowNodeRef>Task_ReUnderwrite</flowNodeRef>
+      </lane>
+      <lane id="Lane_FraudCompliance" name="Fraud and Compliance Team">
+        <flowNodeRef>Task_KYCVerification</flowNodeRef>
+        <flowNodeRef>GW_KYCResult</flowNodeRef>
+        <flowNodeRef>Task_AMLScreening</flowNodeRef>
+        <flowNodeRef>GW_AMLResult</flowNodeRef>
+        <flowNodeRef>Task_FraudInvestigation</flowNodeRef>
+        <flowNodeRef>Task_ManualKYC</flowNodeRef>
+        <flowNodeRef>EndEvent_FraudTerminated</flowNodeRef>
+      </lane>
+      <lane id="Lane_Operations" name="Operations / Disbursement">
+        <flowNodeRef>Task_PrepareDisbursement</flowNodeRef>
+        <flowNodeRef>Task_DisburseFunds</flowNodeRef>
+        <flowNodeRef>BoundaryError_DisbursementFail</flowNodeRef>
+        <flowNodeRef>Task_RetryDisbursement</flowNodeRef>
+        <flowNodeRef>Task_CreateLoanAccount</flowNodeRef>
+        <flowNodeRef>Task_NotifyApplicant</flowNodeRef>
+        <flowNodeRef>GW_DisbursementRetry</flowNodeRef>
+        <flowNodeRef>EndEvent_DisbursementFailed</flowNodeRef>
+      </lane>
+      <lane id="Lane_CoreBanking" name="Core Banking System">
+        <flowNodeRef>GW_ParallelSplit</flowNodeRef>
+        <flowNodeRef>GW_ParallelJoin</flowNodeRef>
+        <flowNodeRef>Task_RequestCreditBureau</flowNodeRef>
+        <flowNodeRef>IntermediateCatch_CreditReport</flowNodeRef>
+        <flowNodeRef>BoundaryTimer_CreditBureauTimeout</flowNodeRef>
+        <flowNodeRef>GW_CreditScoreOK</flowNodeRef>
+        <flowNodeRef>Task_IncomeDTICheck</flowNodeRef>
+        <flowNodeRef>GW_DTIResult</flowNodeRef>
+      </lane>
+    </laneSet>
+
+    <!-- ========== START EVENT ========== -->
+    <startEvent id="StartEvent_ApplyLoan" name="Applicant Submits Loan Application and Supporting Documents">
+      <outgoing>SF_Start_Submit</outgoing>
+    </startEvent>
+
+    <!-- ========== APPLICANT LANE ========== -->
+    <userTask id="Task_SubmitApplication" name="Submit Loan Application Form and Upload Documents">
+      <incoming>SF_Start_Submit</incoming>
+      <outgoing>SF_Submit_DocCheck</outgoing>
+    </userTask>
+
+    <userTask id="Task_CorrectDocuments" name="Correct and Resubmit Documents (L1)">
+      <incoming>SF_DocIncomplete_Correct</incoming>
+      <outgoing>SF_Correct_DocCheck</outgoing>
+    </userTask>
+
+    <userTask id="Task_ReviewOffer" name="Review Loan Offer Terms and Conditions (L9)">
+      <incoming>SF_Offer_ReviewOffer</incoming>
+      <outgoing>SF_ReviewOffer_Decision</outgoing>
+    </userTask>
+
+    <boundaryEvent id="BoundaryTimer_OfferTimeout" name="Offer Acceptance Timeout - 7 Days (L9)" attachedToRef="Task_ReviewOffer" cancelActivity="true">
+      <outgoing>SF_OfferTimeout_Expired</outgoing>
+      <timerEventDefinition id="TimerDef_OfferTimeout">
+        <timeDuration>P7D</timeDuration>
+      </timerEventDefinition>
+    </boundaryEvent>
+
+    <exclusiveGateway id="GW_OfferDecision" name="Applicant Decision: Accept / Counter / Withdraw?">
+      <incoming>SF_ReviewOffer_Decision</incoming>
+      <outgoing>SF_Accept_ESign</outgoing>
+      <outgoing>SF_Counter_CounterOffer</outgoing>
+      <outgoing>SF_Withdraw_Loan</outgoing>
+    </exclusiveGateway>
+
+    <userTask id="Task_ESignAgreement" name="E-Sign Loan Agreement (L11)">
+      <incoming>SF_Accept_ESign</incoming>
+      <incoming>SF_FinalizeAgreement_ESign</incoming>
+      <outgoing>SF_ESign_Disburse</outgoing>
+    </userTask>
+
+    <boundaryEvent id="BoundaryTimer_ESignTimeout" name="E-Signature Timeout - 48 Hours (L11)" attachedToRef="Task_ESignAgreement" cancelActivity="false">
+      <outgoing>SF_ESignTimeout_Manual</outgoing>
+      <timerEventDefinition id="TimerDef_ESignTimeout">
+        <timeDuration>PT48H</timeDuration>
+      </timerEventDefinition>
+    </boundaryEvent>
+
+    <userTask id="Task_WithdrawApplication" name="Submit Withdrawal Request (L10)">
+      <incoming>SF_Withdraw_Loan</incoming>
+      <outgoing>SF_WithdrawApp_End</outgoing>
+    </userTask>
+
+    <endEvent id="EndEvent_LoanDisbursed" name="Loan Disbursed - Application Completed - SUCCESS">
+      <incoming>SF_NotifyApplicant_Success</incoming>
+    </endEvent>
+
+    <endEvent id="EndEvent_Withdrawn" name="Application Withdrawn by Applicant (L10)">
+      <incoming>SF_WithdrawApp_End</incoming>
+    </endEvent>
+
+    <endEvent id="EndEvent_OfferExpired" name="Loan Offer Expired - No Response Within 7 Days (L9)">
+      <incoming>SF_OfferTimeout_Expired</incoming>
+    </endEvent>
+
+    <!-- ========== LOAN OFFICER LANE ========== -->
+    <serviceTask id="Task_CheckDocCompleteness" name="Check Document Completeness and Format (L1)">
+      <incoming>SF_Submit_DocCheck</incoming>
+      <incoming>SF_Correct_DocCheck</incoming>
+      <outgoing>SF_DocCheck_GW</outgoing>
+    </serviceTask>
+
+    <exclusiveGateway id="GW_DocComplete" name="Documents Complete? (L1)">
+      <incoming>SF_DocCheck_GW</incoming>
+      <outgoing>SF_DocOK_ParallelSplit</outgoing>
+      <outgoing>SF_DocIncomplete_Return</outgoing>
+    </exclusiveGateway>
+
+    <userTask id="Task_ReturnIncomplete" name="Return Application - Request Missing Documents (L1)">
+      <incoming>SF_DocIncomplete_Return</incoming>
+      <outgoing>SF_DocIncomplete_Correct</outgoing>
+    </userTask>
+
+    <userTask id="Task_VerifyIncome" name="Verify Income Employment and Bank Statements (L6)">
+      <incoming>SF_IncomeDTI_VerifyIncome</incoming>
+      <outgoing>SF_VerifyIncome_Eligibility</outgoing>
+    </userTask>
+
+    <serviceTask id="Task_CalculateEligibility" name="Calculate Eligibility and Risk Score (L5/L6)">
+      <incoming>SF_VerifyIncome_Eligibility</incoming>
+      <outgoing>SF_Eligibility_GW</outgoing>
+    </serviceTask>
+
+    <exclusiveGateway id="GW_EligibilityScore" name="Eligibility Decision: Auto-Approve / Manual Review / Reject?">
+      <incoming>SF_Eligibility_GW</incoming>
+      <outgoing>SF_AutoApprove_Offer</outgoing>
+      <outgoing>SF_ManualReview_Underwriter</outgoing>
+      <outgoing>SF_Reject_End</outgoing>
+    </exclusiveGateway>
+
+    <userTask id="Task_GenerateLoanOffer" name="Generate Loan Offer Letter with Terms">
+      <incoming>SF_AutoApprove_Offer</incoming>
+      <incoming>SF_Underwriter_Approve</incoming>
+      <outgoing>SF_GenerateOffer_Send</outgoing>
+    </userTask>
+
+    <sendTask id="Task_SendOffer" name="Send Loan Offer to Applicant (L9)">
+      <incoming>SF_GenerateOffer_Send</incoming>
+      <outgoing>SF_Offer_ReviewOffer</outgoing>
+    </sendTask>
+
+    <userTask id="Task_CounterOffer" name="Review Counter-Offer Request and Negotiate Terms">
+      <incoming>SF_Counter_CounterOffer</incoming>
+      <outgoing>SF_Counter_GW</outgoing>
+    </userTask>
+
+    <exclusiveGateway id="GW_CounterOfferDecision" name="Counter-Offer Accepted by Bank?">
+      <incoming>SF_Counter_GW</incoming>
+      <outgoing>SF_CounterAccept_NewOffer</outgoing>
+      <outgoing>SF_CounterReject_Reject</outgoing>
+    </exclusiveGateway>
+
+    <userTask id="Task_FinalizeAgreement" name="Finalize Agreement with Negotiated Terms">
+      <incoming>SF_CounterAccept_NewOffer</incoming>
+      <outgoing>SF_FinalizeAgreement_ESign</outgoing>
+    </userTask>
+
+    <endEvent id="EndEvent_Rejected" name="Loan Application Rejected (L5/L6)">
+      <incoming>SF_Reject_End</incoming>
+      <incoming>SF_CounterReject_Reject</incoming>
+      <incoming>SF_UnderwriterReject</incoming>
+      <incoming>SF_KYCFail_End</incoming>
+      <incoming>SF_DTIFail_End</incoming>
+    </endEvent>
+
+    <endEvent id="EndEvent_ApplicationLapsed" name="Application Lapsed - No Documents Resubmitted (L1)">
+      <incoming>SF_DocLapsed_End</incoming>
+    </endEvent>
+
+    <!-- ========== UNDERWRITER LANE ========== -->
+    <userTask id="Task_UnderwriterReview" name="Underwriter Full Manual Review - High Value or Borderline Case (L7)">
+      <incoming>SF_ManualReview_Underwriter</incoming>
+      <incoming>SF_ReUnderwrite_Review</incoming>
+      <outgoing>SF_Underwriter_Decision</outgoing>
+    </userTask>
+
+    <exclusiveGateway id="GW_UnderwriterDecision" name="Underwriter Decision: Approve / Request Collateral / Reject?">
+      <incoming>SF_Underwriter_Decision</incoming>
+      <outgoing>SF_Underwriter_Approve</outgoing>
+      <outgoing>SF_Underwriter_Collateral</outgoing>
+      <outgoing>SF_UnderwriterReject</outgoing>
+    </exclusiveGateway>
+
+    <userTask id="Task_RequestCollateral" name="Request Collateral Valuation and Documentation (L8)">
+      <incoming>SF_Underwriter_Collateral</incoming>
+      <outgoing>SF_Collateral_GW</outgoing>
+    </userTask>
+
+    <exclusiveGateway id="GW_CollateralOK" name="Collateral Valuation Satisfactory? (L8)">
+      <incoming>SF_Collateral_GW</incoming>
+      <outgoing>SF_CollateralOK_Approve</outgoing>
+      <outgoing>SF_CollateralFail_ReUnderwrite</outgoing>
+    </exclusiveGateway>
+
+    <userTask id="Task_ReUnderwrite" name="Re-Underwrite with Revised Collateral Data (L8)">
+      <incoming>SF_CollateralFail_ReUnderwrite</incoming>
+      <outgoing>SF_ReUnderwrite_Review</outgoing>
+    </userTask>
+
+    <!-- ========== FRAUD AND COMPLIANCE LANE ========== -->
+    <serviceTask id="Task_KYCVerification" name="KYC Identity Verification (L2)">
+      <incoming>SF_ParallelSplit_KYC</incoming>
+      <outgoing>SF_KYC_GW</outgoing>
+    </serviceTask>
+
+    <exclusiveGateway id="GW_KYCResult" name="KYC Passed? (L2)">
+      <incoming>SF_KYC_GW</incoming>
+      <outgoing>SF_KYCPass_AML</outgoing>
+      <outgoing>SF_KYCFail_Manual</outgoing>
+    </exclusiveGateway>
+
+    <userTask id="Task_ManualKYC" name="Manual KYC Verification by Compliance Officer (L2)">
+      <incoming>SF_KYCFail_Manual</incoming>
+      <outgoing>SF_ManualKYC_AML</outgoing>
+    </userTask>
+
+    <serviceTask id="Task_AMLScreening" name="AML and Fraud Screening (L3)">
+      <incoming>SF_KYCPass_AML</incoming>
+      <incoming>SF_ManualKYC_AML</incoming>
+      <outgoing>SF_AML_GW</outgoing>
+    </serviceTask>
+
+    <exclusiveGateway id="GW_AMLResult" name="AML / Fraud Screening Passed? (L3)">
+      <incoming>SF_AML_GW</incoming>
+      <outgoing>SF_AMLPass_Join</outgoing>
+      <outgoing>SF_AMLFail_Investigate</outgoing>
+    </exclusiveGateway>
+
+    <userTask id="Task_FraudInvestigation" name="Initiate Fraud Investigation and Hold Application (L3)">
+      <incoming>SF_AMLFail_Investigate</incoming>
+      <outgoing>SF_FraudInv_End</outgoing>
+    </userTask>
+
+    <endEvent id="EndEvent_FraudTerminated" name="Application Terminated - Fraud or AML Violation (L3)">
+      <incoming>SF_FraudInv_End</incoming>
+      <incoming>SF_KYCFail_End</incoming>
+    </endEvent>
+
+    <!-- ========== CORE BANKING SYSTEM LANE ========== -->
+    <parallelGateway id="GW_ParallelSplit" name="Start Parallel Verification Checks">
+      <incoming>SF_DocOK_ParallelSplit</incoming>
+      <outgoing>SF_ParallelSplit_KYC</outgoing>
+      <outgoing>SF_ParallelSplit_CreditBureau</outgoing>
+      <outgoing>SF_ParallelSplit_IncomeDTI</outgoing>
+    </parallelGateway>
+
+    <sendTask id="Task_RequestCreditBureau" name="Request Credit Report from Credit Bureau (L4)">
+      <incoming>SF_ParallelSplit_CreditBureau</incoming>
+      <outgoing>SF_CreditRequest_Catch</outgoing>
+    </sendTask>
+
+    <intermediateCatchEvent id="IntermediateCatch_CreditReport" name="Receive Credit Report from Bureau (L4)">
+      <incoming>SF_CreditRequest_Catch</incoming>
+      <outgoing>SF_CreditReport_GW</outgoing>
+      <messageEventDefinition id="MsgDef_CreditReport" messageRef="Msg_CreditReport" />
+    </intermediateCatchEvent>
+
+    <boundaryEvent id="BoundaryTimer_CreditBureauTimeout" name="Credit Bureau Response Timeout - 24 Hours (L4)" attachedToRef="Task_RequestCreditBureau" cancelActivity="false">
+      <outgoing>SF_CreditTimeout_Retry</outgoing>
+      <timerEventDefinition id="TimerDef_CreditTimeout">
+        <timeDuration>PT24H</timeDuration>
+      </timerEventDefinition>
+    </boundaryEvent>
+
+    <exclusiveGateway id="GW_CreditScoreOK" name="Credit Score Acceptable? (L5)">
+      <incoming>SF_CreditReport_GW</incoming>
+      <outgoing>SF_CreditOK_Join</outgoing>
+      <outgoing>SF_CreditFail_Join</outgoing>
+    </exclusiveGateway>
+
+    <serviceTask id="Task_IncomeDTICheck" name="Income and DTI Ratio Automated Check (L6)">
+      <incoming>SF_ParallelSplit_IncomeDTI</incoming>
+      <outgoing>SF_IncomeDTI_GW</outgoing>
+    </serviceTask>
+
+    <exclusiveGateway id="GW_DTIResult" name="DTI Ratio Acceptable? (L6)">
+      <incoming>SF_IncomeDTI_GW</incoming>
+      <outgoing>SF_DTIOk_Join</outgoing>
+      <outgoing>SF_DTIFail_End</outgoing>
+    </exclusiveGateway>
+
+    <parallelGateway id="GW_ParallelJoin" name="All Parallel Checks Complete">
+      <incoming>SF_AMLPass_Join</incoming>
+      <incoming>SF_CreditOK_Join</incoming>
+      <incoming>SF_DTIOk_Join</incoming>
+      <outgoing>SF_ParallelJoin_Income</outgoing>
+    </parallelGateway>
+
+    <!-- ========== OPERATIONS LANE ========== -->
+    <userTask id="Task_PrepareDisbursement" name="Prepare Disbursement Instructions and Verify Account Details">
+      <incoming>SF_ESign_Disburse</incoming>
+      <incoming>SF_ESignTimeout_Manual</incoming>
+      <outgoing>SF_PrepareDisbursement_Disburse</outgoing>
+    </userTask>
+
+    <serviceTask id="Task_DisburseFunds" name="Disburse Loan Funds to Applicant Account (L12)">
+      <incoming>SF_PrepareDisbursement_Disburse</incoming>
+      <outgoing>SF_Disburse_CreateAccount</outgoing>
+    </serviceTask>
+
+    <boundaryEvent id="BoundaryError_DisbursementFail" name="Disbursement System Error (L12)" attachedToRef="Task_DisburseFunds" cancelActivity="true">
+      <outgoing>SF_DisburseFail_Retry</outgoing>
+      <errorEventDefinition id="ErrCatch_DisburseFail" errorRef="Err_DisbursementFail" />
+    </boundaryEvent>
+
+    <userTask id="Task_RetryDisbursement" name="Retry Disbursement or Use Fallback Channel (L12)">
+      <incoming>SF_DisburseFail_Retry</incoming>
+      <outgoing>SF_RetryDisburse_GW</outgoing>
+    </userTask>
+
+    <exclusiveGateway id="GW_DisbursementRetry" name="Retry Successful? (L12)">
+      <incoming>SF_RetryDisburse_GW</incoming>
+      <outgoing>SF_DisburseRetryOK_Account</outgoing>
+      <outgoing>SF_DisburseRetryFail_End</outgoing>
+    </exclusiveGateway>
+
+    <serviceTask id="Task_CreateLoanAccount" name="Create Loan Account in Core Banking System">
+      <incoming>SF_Disburse_CreateAccount</incoming>
+      <incoming>SF_DisburseRetryOK_Account</incoming>
+      <outgoing>SF_CreateAccount_Notify</outgoing>
+    </serviceTask>
+
+    <sendTask id="Task_NotifyApplicant" name="Notify Applicant of Successful Disbursement">
+      <incoming>SF_CreateAccount_Notify</incoming>
+      <outgoing>SF_NotifyApplicant_Success</outgoing>
+    </sendTask>
+
+    <endEvent id="EndEvent_DisbursementFailed" name="Disbursement Failed After Retries - Manual Intervention Required (L12)">
+      <incoming>SF_DisburseRetryFail_End</incoming>
+      <errorEventDefinition id="ErrDef_DisburseFail" errorRef="Err_DisbursementFail" />
+    </endEvent>
+
+    <!-- ========== SEQUENCE FLOWS ========== -->
+    <!-- Start -->
+    <sequenceFlow id="SF_Start_Submit" sourceRef="StartEvent_ApplyLoan" targetRef="Task_SubmitApplication" />
+    <sequenceFlow id="SF_Submit_DocCheck" sourceRef="Task_SubmitApplication" targetRef="Task_CheckDocCompleteness" />
+
+    <!-- Document Check (L1) -->
+    <sequenceFlow id="SF_DocCheck_GW" sourceRef="Task_CheckDocCompleteness" targetRef="GW_DocComplete" />
+    <sequenceFlow id="SF_DocOK_ParallelSplit" name="Documents Complete" sourceRef="GW_DocComplete" targetRef="GW_ParallelSplit" />
+    <sequenceFlow id="SF_DocIncomplete_Return" name="Incomplete (L1)" sourceRef="GW_DocComplete" targetRef="Task_ReturnIncomplete" />
+    <sequenceFlow id="SF_DocIncomplete_Correct" sourceRef="Task_ReturnIncomplete" targetRef="Task_CorrectDocuments" />
+    <sequenceFlow id="SF_Correct_DocCheck" sourceRef="Task_CorrectDocuments" targetRef="Task_CheckDocCompleteness" />
+    <sequenceFlow id="SF_DocLapsed_End" name="No Response - Lapsed (L1)" sourceRef="Task_ReturnIncomplete" targetRef="EndEvent_ApplicationLapsed" />
+
+    <!-- Parallel Split -->
+    <sequenceFlow id="SF_ParallelSplit_KYC" sourceRef="GW_ParallelSplit" targetRef="Task_KYCVerification" />
+    <sequenceFlow id="SF_ParallelSplit_CreditBureau" sourceRef="GW_ParallelSplit" targetRef="Task_RequestCreditBureau" />
+    <sequenceFlow id="SF_ParallelSplit_IncomeDTI" sourceRef="GW_ParallelSplit" targetRef="Task_IncomeDTICheck" />
+
+    <!-- KYC (L2) -->
+    <sequenceFlow id="SF_KYC_GW" sourceRef="Task_KYCVerification" targetRef="GW_KYCResult" />
+    <sequenceFlow id="SF_KYCPass_AML" name="KYC Passed" sourceRef="GW_KYCResult" targetRef="Task_AMLScreening" />
+    <sequenceFlow id="SF_KYCFail_Manual" name="KYC Failed - Manual Review (L2)" sourceRef="GW_KYCResult" targetRef="Task_ManualKYC" />
+    <sequenceFlow id="SF_KYCFail_End" name="KYC Unresolvable" sourceRef="GW_KYCResult" targetRef="EndEvent_FraudTerminated" />
+    <sequenceFlow id="SF_ManualKYC_AML" sourceRef="Task_ManualKYC" targetRef="Task_AMLScreening" />
+
+    <!-- AML / Fraud (L3) -->
+    <sequenceFlow id="SF_AML_GW" sourceRef="Task_AMLScreening" targetRef="GW_AMLResult" />
+    <sequenceFlow id="SF_AMLPass_Join" name="AML Passed" sourceRef="GW_AMLResult" targetRef="GW_ParallelJoin" />
+    <sequenceFlow id="SF_AMLFail_Investigate" name="AML Flag (L3)" sourceRef="GW_AMLResult" targetRef="Task_FraudInvestigation" />
+    <sequenceFlow id="SF_FraudInv_End" sourceRef="Task_FraudInvestigation" targetRef="EndEvent_FraudTerminated" />
+
+    <!-- Credit Bureau (L4) -->
+    <sequenceFlow id="SF_CreditRequest_Catch" sourceRef="Task_RequestCreditBureau" targetRef="IntermediateCatch_CreditReport" />
+    <sequenceFlow id="SF_CreditReport_GW" sourceRef="IntermediateCatch_CreditReport" targetRef="GW_CreditScoreOK" />
+    <sequenceFlow id="SF_CreditTimeout_Retry" name="Bureau Timeout (L4)" sourceRef="BoundaryTimer_CreditBureauTimeout" targetRef="Task_RequestCreditBureau" />
+    <sequenceFlow id="SF_CreditOK_Join" name="Credit Score OK" sourceRef="GW_CreditScoreOK" targetRef="GW_ParallelJoin" />
+    <sequenceFlow id="SF_CreditFail_Join" name="Credit Score Low (L5)" sourceRef="GW_CreditScoreOK" targetRef="GW_ParallelJoin" />
+
+    <!-- Income/DTI (L6) -->
+    <sequenceFlow id="SF_IncomeDTI_GW" sourceRef="Task_IncomeDTICheck" targetRef="GW_DTIResult" />
+    <sequenceFlow id="SF_DTIOk_Join" name="DTI Acceptable" sourceRef="GW_DTIResult" targetRef="GW_ParallelJoin" />
+    <sequenceFlow id="SF_DTIFail_End" name="DTI Too High (L6)" sourceRef="GW_DTIResult" targetRef="EndEvent_Rejected" />
+
+    <!-- Parallel Join -->
+    <sequenceFlow id="SF_ParallelJoin_Income" sourceRef="GW_ParallelJoin" targetRef="Task_VerifyIncome" />
+
+    <!-- Income Verification and Eligibility -->
+    <sequenceFlow id="SF_IncomeDTI_VerifyIncome" sourceRef="GW_ParallelJoin" targetRef="Task_VerifyIncome" />
+    <sequenceFlow id="SF_VerifyIncome_Eligibility" sourceRef="Task_VerifyIncome" targetRef="Task_CalculateEligibility" />
+    <sequenceFlow id="SF_Eligibility_GW" sourceRef="Task_CalculateEligibility" targetRef="GW_EligibilityScore" />
+    <sequenceFlow id="SF_AutoApprove_Offer" name="Auto-Approve" sourceRef="GW_EligibilityScore" targetRef="Task_GenerateLoanOffer" />
+    <sequenceFlow id="SF_ManualReview_Underwriter" name="Manual Review - High Risk (L7)" sourceRef="GW_EligibilityScore" targetRef="Task_UnderwriterReview" />
+    <sequenceFlow id="SF_Reject_End" name="Rejected (L5/L6)" sourceRef="GW_EligibilityScore" targetRef="EndEvent_Rejected" />
+
+    <!-- Underwriter (L7/L8) -->
+    <sequenceFlow id="SF_Underwriter_Decision" sourceRef="Task_UnderwriterReview" targetRef="GW_UnderwriterDecision" />
+    <sequenceFlow id="SF_Underwriter_Approve" name="Approved" sourceRef="GW_UnderwriterDecision" targetRef="Task_GenerateLoanOffer" />
+    <sequenceFlow id="SF_Underwriter_Collateral" name="Requires Collateral (L8)" sourceRef="GW_UnderwriterDecision" targetRef="Task_RequestCollateral" />
+    <sequenceFlow id="SF_UnderwriterReject" name="Rejected (L7)" sourceRef="GW_UnderwriterDecision" targetRef="EndEvent_Rejected" />
+    <sequenceFlow id="SF_Collateral_GW" sourceRef="Task_RequestCollateral" targetRef="GW_CollateralOK" />
+    <sequenceFlow id="SF_CollateralOK_Approve" name="Collateral OK" sourceRef="GW_CollateralOK" targetRef="Task_GenerateLoanOffer" />
+    <sequenceFlow id="SF_CollateralFail_ReUnderwrite" name="Collateral Insufficient" sourceRef="GW_CollateralOK" targetRef="Task_ReUnderwrite" />
+    <sequenceFlow id="SF_ReUnderwrite_Review" sourceRef="Task_ReUnderwrite" targetRef="Task_UnderwriterReview" />
+
+    <!-- Offer (L9) -->
+    <sequenceFlow id="SF_GenerateOffer_Send" sourceRef="Task_GenerateLoanOffer" targetRef="Task_SendOffer" />
+    <sequenceFlow id="SF_Offer_ReviewOffer" sourceRef="Task_SendOffer" targetRef="Task_ReviewOffer" />
+    <sequenceFlow id="SF_ReviewOffer_Decision" sourceRef="Task_ReviewOffer" targetRef="GW_OfferDecision" />
+    <sequenceFlow id="SF_Accept_ESign" name="Accept" sourceRef="GW_OfferDecision" targetRef="Task_ESignAgreement" />
+    <sequenceFlow id="SF_Counter_CounterOffer" name="Counter-Offer" sourceRef="GW_OfferDecision" targetRef="Task_CounterOffer" />
+    <sequenceFlow id="SF_Withdraw_Loan" name="Withdraw (L10)" sourceRef="GW_OfferDecision" targetRef="Task_WithdrawApplication" />
+    <sequenceFlow id="SF_OfferTimeout_Expired" name="Offer Expired (L9)" sourceRef="BoundaryTimer_OfferTimeout" targetRef="EndEvent_OfferExpired" />
+    <sequenceFlow id="SF_Counter_GW" sourceRef="Task_CounterOffer" targetRef="GW_CounterOfferDecision" />
+    <sequenceFlow id="SF_CounterAccept_NewOffer" name="Bank Accepts Counter" sourceRef="GW_CounterOfferDecision" targetRef="Task_FinalizeAgreement" />
+    <sequenceFlow id="SF_CounterReject_Reject" name="Bank Rejects Counter" sourceRef="GW_CounterOfferDecision" targetRef="EndEvent_Rejected" />
+    <sequenceFlow id="SF_FinalizeAgreement_ESign" sourceRef="Task_FinalizeAgreement" targetRef="Task_ESignAgreement" />
+
+    <!-- E-Sign (L11) -->
+    <sequenceFlow id="SF_ESign_Disburse" sourceRef="Task_ESignAgreement" targetRef="Task_PrepareDisbursement" />
+    <sequenceFlow id="SF_ESignTimeout_Manual" name="E-Sign Timeout - Manual Intervention (L11)" sourceRef="BoundaryTimer_ESignTimeout" targetRef="Task_PrepareDisbursement" />
+
+    <!-- Withdrawal (L10) -->
+    <sequenceFlow id="SF_WithdrawApp_End" sourceRef="Task_WithdrawApplication" targetRef="EndEvent_Withdrawn" />
+
+    <!-- Disbursement (L12) -->
+    <sequenceFlow id="SF_PrepareDisbursement_Disburse" sourceRef="Task_PrepareDisbursement" targetRef="Task_DisburseFunds" />
+    <sequenceFlow id="SF_Disburse_CreateAccount" sourceRef="Task_DisburseFunds" targetRef="Task_CreateLoanAccount" />
+    <sequenceFlow id="SF_DisburseFail_Retry" name="Disbursement Error (L12)" sourceRef="BoundaryError_DisbursementFail" targetRef="Task_RetryDisbursement" />
+    <sequenceFlow id="SF_RetryDisburse_GW" sourceRef="Task_RetryDisbursement" targetRef="GW_DisbursementRetry" />
+    <sequenceFlow id="SF_DisburseRetryOK_Account" name="Retry Successful" sourceRef="GW_DisbursementRetry" targetRef="Task_CreateLoanAccount" />
+    <sequenceFlow id="SF_DisburseRetryFail_End" name="Retry Failed (L12)" sourceRef="GW_DisbursementRetry" targetRef="EndEvent_DisbursementFailed" />
+    <sequenceFlow id="SF_CreateAccount_Notify" sourceRef="Task_CreateLoanAccount" targetRef="Task_NotifyApplicant" />
+    <sequenceFlow id="SF_NotifyApplicant_Success" sourceRef="Task_NotifyApplicant" targetRef="EndEvent_LoanDisbursed" />
+
+  </process>
+
+  <!-- ========== MESSAGES ========== -->
+  <message id="Msg_CreditRequest" name="CreditReportRequest" />
+  <message id="Msg_CreditReport" name="CreditReportResponse" />
+
+  <!-- ========== ERRORS ========== -->
+  <error id="Err_DisbursementFail" name="DisbursementFailureError" errorCode="DISBURSE_FAIL" />
+
+  <!-- ==================== BPMN DI ==================== -->
+  <bpmndi:BPMNDiagram id="BPMNDiagram_A3">
+    <bpmndi:BPMNPlane id="BPMNPlane_A3" bpmnElement="Collaboration_Assignment3">
+
+      <!-- External Credit Bureau Pool -->
+      <bpmndi:BPMNShape id="Shape_Pool_CB" bpmnElement="Pool_CreditBureau" isHorizontal="true">
+        <dc:Bounds x="100" y="40" width="2900" height="120" />
+      </bpmndi:BPMNShape>
+
+      <!-- Credit Bureau shapes -->
+      <bpmndi:BPMNShape id="Shape_CB_Start" bpmnElement="SubStart_CB">
+        <dc:Bounds x="1582" y="82" width="36" height="36" />
+        <bpmndi:BPMNLabel><dc:Bounds x="1558" y="125" width="84" height="28" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_CB_Report" bpmnElement="Task_CB_GenerateReport">
+        <dc:Bounds x="1668" y="60" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_CB_End" bpmnElement="SubEnd_CB">
+        <dc:Bounds x="1858" y="82" width="36" height="36" />
+        <bpmndi:BPMNLabel><dc:Bounds x="1834" y="125" width="84" height="28" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <!-- Main Bank Pool -->
+      <bpmndi:BPMNShape id="Shape_Pool_Bank" bpmnElement="Pool_Bank" isHorizontal="true">
+        <dc:Bounds x="100" y="180" width="2900" height="1300" />
+      </bpmndi:BPMNShape>
+
+      <!-- Lanes -->
+      <bpmndi:BPMNShape id="Shape_Ln_Applicant" bpmnElement="Lane_Applicant" isHorizontal="true">
+        <dc:Bounds x="130" y="180" width="2870" height="180" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Ln_LoanOfficer" bpmnElement="Lane_LoanOfficer" isHorizontal="true">
+        <dc:Bounds x="130" y="360" width="2870" height="200" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Ln_Underwriter" bpmnElement="Lane_Underwriter" isHorizontal="true">
+        <dc:Bounds x="130" y="560" width="2870" height="180" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Ln_Fraud" bpmnElement="Lane_FraudCompliance" isHorizontal="true">
+        <dc:Bounds x="130" y="740" width="2870" height="200" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Ln_CoreBanking" bpmnElement="Lane_CoreBanking" isHorizontal="true">
+        <dc:Bounds x="130" y="940" width="2870" height="200" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Ln_Operations" bpmnElement="Lane_Operations" isHorizontal="true">
+        <dc:Bounds x="130" y="1140" width="2870" height="340" />
+      </bpmndi:BPMNShape>
+
+      <!-- START -->
+      <bpmndi:BPMNShape id="Shape_Start_A3" bpmnElement="StartEvent_ApplyLoan">
+        <dc:Bounds x="182" y="251" width="36" height="36" />
+        <bpmndi:BPMNLabel><dc:Bounds x="156" y="294" width="88" height="40" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <!-- Applicant Lane -->
+      <bpmndi:BPMNShape id="Shape_SubmitApp" bpmnElement="Task_SubmitApplication">
+        <dc:Bounds x="268" y="229" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_CorrectDocs" bpmnElement="Task_CorrectDocuments">
+        <dc:Bounds x="468" y="229" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_ReviewOffer" bpmnElement="Task_ReviewOffer">
+        <dc:Bounds x="2268" y="229" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_BTimer_Offer" bpmnElement="BoundaryTimer_OfferTimeout">
+        <dc:Bounds x="2320" y="291" width="36" height="36" />
+        <bpmndi:BPMNLabel><dc:Bounds x="2300" y="332" width="76" height="40" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_GW_OfferDec" bpmnElement="GW_OfferDecision" isMarkerVisible="true">
+        <dc:Bounds x="2458" y="249" width="50" height="50" />
+        <bpmndi:BPMNLabel><dc:Bounds x="2428" y="304" width="110" height="40" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_ESign" bpmnElement="Task_ESignAgreement">
+        <dc:Bounds x="2568" y="229" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_BTimer_ESign" bpmnElement="BoundaryTimer_ESignTimeout">
+        <dc:Bounds x="2620" y="291" width="36" height="36" />
+        <bpmndi:BPMNLabel><dc:Bounds x="2600" y="332" width="76" height="40" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Withdraw" bpmnElement="Task_WithdrawApplication">
+        <dc:Bounds x="2568" y="169" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_EndDisbursed" bpmnElement="EndEvent_LoanDisbursed">
+        <dc:Bounds x="2868" y="251" width="36" height="36" />
+        <bpmndi:BPMNLabel><dc:Bounds x="2843" y="294" width="86" height="40" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_EndWithdrawn" bpmnElement="EndEvent_Withdrawn">
+        <dc:Bounds x="2768" y="191" width="36" height="36" />
+        <bpmndi:BPMNLabel><dc:Bounds x="2743" y="234" width="86" height="28" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_EndOfferExp" bpmnElement="EndEvent_OfferExpired">
+        <dc:Bounds x="2468" y="191" width="36" height="36" />
+        <bpmndi:BPMNLabel><dc:Bounds x="2443" y="234" width="86" height="28" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <!-- Loan Officer Lane -->
+      <bpmndi:BPMNShape id="Shape_CheckDoc" bpmnElement="Task_CheckDocCompleteness">
+        <dc:Bounds x="668" y="419" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_GW_DocComp" bpmnElement="GW_DocComplete" isMarkerVisible="true">
+        <dc:Bounds x="858" y="439" width="50" height="50" />
+        <bpmndi:BPMNLabel><dc:Bounds x="838" y="494" width="90" height="28" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_ReturnInc" bpmnElement="Task_ReturnIncomplete">
+        <dc:Bounds x="468" y="419" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_VerifyIncome" bpmnElement="Task_VerifyIncome">
+        <dc:Bounds x="1568" y="419" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_CalcElig" bpmnElement="Task_CalculateEligibility">
+        <dc:Bounds x="1768" y="419" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_GW_Elig" bpmnElement="GW_EligibilityScore" isMarkerVisible="true">
+        <dc:Bounds x="1958" y="439" width="50" height="50" />
+        <bpmndi:BPMNLabel><dc:Bounds x="1928" y="494" width="110" height="40" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_GenOffer" bpmnElement="Task_GenerateLoanOffer">
+        <dc:Bounds x="2068" y="419" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_SendOffer" bpmnElement="Task_SendOffer">
+        <dc:Bounds x="2268" y="419" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Counter" bpmnElement="Task_CounterOffer">
+        <dc:Bounds x="2568" y="419" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_GW_Counter" bpmnElement="GW_CounterOfferDecision" isMarkerVisible="true">
+        <dc:Bounds x="2758" y="439" width="50" height="50" />
+        <bpmndi:BPMNLabel><dc:Bounds x="2738" y="494" width="90" height="28" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Finalize" bpmnElement="Task_FinalizeAgreement">
+        <dc:Bounds x="2768" y="359" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_EndRejected" bpmnElement="EndEvent_Rejected">
+        <dc:Bounds x="2068" y="481" width="36" height="36" />
+        <bpmndi:BPMNLabel><dc:Bounds x="2043" y="522" width="86" height="28" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_EndLapsed" bpmnElement="EndEvent_ApplicationLapsed">
+        <dc:Bounds x="368" y="461" width="36" height="36" />
+        <bpmndi:BPMNLabel><dc:Bounds x="343" y="502" width="86" height="28" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <!-- Underwriter Lane -->
+      <bpmndi:BPMNShape id="Shape_Underwriter" bpmnElement="Task_UnderwriterReview">
+        <dc:Bounds x="2068" y="619" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_GW_Underwriter" bpmnElement="GW_UnderwriterDecision" isMarkerVisible="true">
+        <dc:Bounds x="2268" y="639" width="50" height="50" />
+        <bpmndi:BPMNLabel><dc:Bounds x="2238" y="694" width="110" height="40" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Collateral" bpmnElement="Task_RequestCollateral">
+        <dc:Bounds x="2368" y="619" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_GW_Collateral" bpmnElement="GW_CollateralOK" isMarkerVisible="true">
+        <dc:Bounds x="2568" y="639" width="50" height="50" />
+        <bpmndi:BPMNLabel><dc:Bounds x="2548" y="694" width="90" height="28" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_ReUnderwrite" bpmnElement="Task_ReUnderwrite">
+        <dc:Bounds x="2668" y="619" width="140" height="80" />
+      </bpmndi:BPMNShape>
+
+      <!-- Fraud Lane -->
+      <bpmndi:BPMNShape id="Shape_KYC" bpmnElement="Task_KYCVerification">
+        <dc:Bounds x="1068" y="799" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_GW_KYC" bpmnElement="GW_KYCResult" isMarkerVisible="true">
+        <dc:Bounds x="1258" y="819" width="50" height="50" />
+        <bpmndi:BPMNLabel><dc:Bounds x="1238" y="874" width="90" height="28" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_ManualKYC" bpmnElement="Task_ManualKYC">
+        <dc:Bounds x="1358" y="799" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_AML" bpmnElement="Task_AMLScreening">
+        <dc:Bounds x="1568" y="799" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_GW_AML" bpmnElement="GW_AMLResult" isMarkerVisible="true">
+        <dc:Bounds x="1758" y="819" width="50" height="50" />
+        <bpmndi:BPMNLabel><dc:Bounds x="1738" y="874" width="90" height="28" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_FraudInv" bpmnElement="Task_FraudInvestigation">
+        <dc:Bounds x="1868" y="799" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_EndFraud" bpmnElement="EndEvent_FraudTerminated">
+        <dc:Bounds x="2068" y="821" width="36" height="36" />
+        <bpmndi:BPMNLabel><dc:Bounds x="2043" y="864" width="86" height="40" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <!-- Core Banking Lane -->
+      <bpmndi:BPMNShape id="Shape_GW_ParSplit" bpmnElement="GW_ParallelSplit">
+        <dc:Bounds x="968" y="999" width="50" height="50" />
+        <bpmndi:BPMNLabel><dc:Bounds x="948" y="1054" width="90" height="28" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_RequestCB" bpmnElement="Task_RequestCreditBureau">
+        <dc:Bounds x="1568" y="979" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_BTimer_CB" bpmnElement="BoundaryTimer_CreditBureauTimeout">
+        <dc:Bounds x="1620" y="1041" width="36" height="36" />
+        <bpmndi:BPMNLabel><dc:Bounds x="1600" y="1082" width="76" height="40" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_CatchCreditRep" bpmnElement="IntermediateCatch_CreditReport">
+        <dc:Bounds x="1768" y="1001" width="36" height="36" />
+        <bpmndi:BPMNLabel><dc:Bounds x="1744" y="1044" width="84" height="28" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_GW_Credit" bpmnElement="GW_CreditScoreOK" isMarkerVisible="true">
+        <dc:Bounds x="1858" y="1019" width="50" height="50" />
+        <bpmndi:BPMNLabel><dc:Bounds x="1838" y="1074" width="90" height="28" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_IncomeDTI" bpmnElement="Task_IncomeDTICheck">
+        <dc:Bounds x="1068" y="979" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_GW_DTI" bpmnElement="GW_DTIResult" isMarkerVisible="true">
+        <dc:Bounds x="1258" y="999" width="50" height="50" />
+        <bpmndi:BPMNLabel><dc:Bounds x="1238" y="1054" width="90" height="28" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_GW_ParJoin" bpmnElement="GW_ParallelJoin">
+        <dc:Bounds x="2068" y="1019" width="50" height="50" />
+        <bpmndi:BPMNLabel><dc:Bounds x="2048" y="1074" width="90" height="28" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <!-- Operations Lane -->
+      <bpmndi:BPMNShape id="Shape_PrepDisburse" bpmnElement="Task_PrepareDisbursement">
+        <dc:Bounds x="2668" y="1199" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Disburse" bpmnElement="Task_DisburseFunds">
+        <dc:Bounds x="2368" y="1199" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_BError_Disburse" bpmnElement="BoundaryError_DisbursementFail">
+        <dc:Bounds x="2420" y="1261" width="36" height="36" />
+        <bpmndi:BPMNLabel><dc:Bounds x="2400" y="1302" width="76" height="40" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_RetryDisburse" bpmnElement="Task_RetryDisbursement">
+        <dc:Bounds x="2168" y="1299" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_GW_DisburseRetry" bpmnElement="GW_DisbursementRetry" isMarkerVisible="true">
+        <dc:Bounds x="2068" y="1319" width="50" height="50" />
+        <bpmndi:BPMNLabel><dc:Bounds x="2048" y="1374" width="90" height="28" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_CreateAccount" bpmnElement="Task_CreateLoanAccount">
+        <dc:Bounds x="2168" y="1199" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_NotifyApplicant" bpmnElement="Task_NotifyApplicant">
+        <dc:Bounds x="2568" y="1199" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_EndDisbFailed" bpmnElement="EndEvent_DisbursementFailed">
+        <dc:Bounds x="1968" y="1341" width="36" height="36" />
+        <bpmndi:BPMNLabel><dc:Bounds x="1938" y="1382" width="96" height="40" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <!-- Message Flows (DI) -->
+      <bpmndi:BPMNEdge id="Edge_MF_LoanToCredit" bpmnElement="MF_LoanToCredit">
+        <di:waypoint x="1638" y="979" /><di:waypoint x="1638" y="160" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Edge_MF_CreditToLoan" bpmnElement="MF_CreditToLoan">
+        <di:waypoint x="1894" y="118" /><di:waypoint x="1786" y="1001" />
+      </bpmndi:BPMNEdge>
+
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

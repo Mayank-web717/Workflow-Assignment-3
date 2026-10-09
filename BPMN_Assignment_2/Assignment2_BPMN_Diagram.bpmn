@@ -1,0 +1,765 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+             xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+             xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+             xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+             targetNamespace="http://bpmn.io/schema/bpmn"
+             exporter="BPMN Assignment Generator"
+             exporterVersion="1.0">
+
+  <!-- ============================================================ -->
+  <!-- ASSIGNMENT 2: Logistics and Shipment Exception Management    -->
+  <!-- ============================================================ -->
+
+  <collaboration id="Collaboration_Assignment2">
+    <participant id="Pool_Logistics" name="Logistics and Shipment Exception Management" processRef="Process_Logistics" />
+  </collaboration>
+
+  <process id="Process_Logistics" name="Logistics and Shipment Exception Management" isExecutable="true">
+
+    <laneSet id="LaneSet_Logistics">
+      <lane id="Lane_Shipper" name="Shipper / Customer">
+        <flowNodeRef>StartEvent_BookShipment</flowNodeRef>
+        <flowNodeRef>Task_BookShipment</flowNodeRef>
+        <flowNodeRef>Task_CancelShipment</flowNodeRef>
+        <flowNodeRef>Task_ProvideCustomsDocs</flowNodeRef>
+        <flowNodeRef>IntermediateCatch_CustomsDocs</flowNodeRef>
+        <flowNodeRef>EndEvent_Cancelled</flowNodeRef>
+        <flowNodeRef>EndEvent_RefundIssued</flowNodeRef>
+      </lane>
+      <lane id="Lane_ControlTower" name="Control Tower / Dispatcher">
+        <flowNodeRef>Task_ValidateShipment</flowNodeRef>
+        <flowNodeRef>GW_ValidationOK</flowNodeRef>
+        <flowNodeRef>Task_CalculateCharges</flowNodeRef>
+        <flowNodeRef>Task_SchedulePickup</flowNodeRef>
+        <flowNodeRef>Task_TrackShipment</flowNodeRef>
+        <flowNodeRef>Task_HandleTransitDelay</flowNodeRef>
+        <flowNodeRef>BoundaryTimer_TransitSLA</flowNodeRef>
+        <flowNodeRef>Task_OpenLostTrace</flowNodeRef>
+        <flowNodeRef>Task_EscalateLost</flowNodeRef>
+        <flowNodeRef>Task_ProcessCancellation</flowNodeRef>
+        <flowNodeRef>Task_IssueRefund</flowNodeRef>
+        <flowNodeRef>GW_CancellationFeasible</flowNodeRef>
+        <flowNodeRef>Task_CloseShipment</flowNodeRef>
+        <flowNodeRef>EndEvent_Delivered</flowNodeRef>
+        <flowNodeRef>EndEvent_Lost</flowNodeRef>
+      </lane>
+      <lane id="Lane_PickupAgent" name="Pickup Agent">
+        <flowNodeRef>Task_AssignDriver</flowNodeRef>
+        <flowNodeRef>Task_CollectAndScan</flowNodeRef>
+        <flowNodeRef>GW_PickupSuccess</flowNodeRef>
+        <flowNodeRef>Task_ReschedulePickup</flowNodeRef>
+        <flowNodeRef>BoundaryTimer_PickupRetry</flowNodeRef>
+        <flowNodeRef>GW_PickupRetryOK</flowNodeRef>
+        <flowNodeRef>EndEvent_PickupFailed</flowNodeRef>
+        <flowNodeRef>Task_ReportDamageAtPickup</flowNodeRef>
+        <flowNodeRef>GW_DamageAtPickup</flowNodeRef>
+      </lane>
+      <lane id="Lane_Hub" name="Hub / Warehouse">
+        <flowNodeRef>Task_HubSort</flowNodeRef>
+        <flowNodeRef>Task_InspectParcel</flowNodeRef>
+        <flowNodeRef>GW_ParcelCondition</flowNodeRef>
+        <flowNodeRef>Task_IsolateParcel</flowNodeRef>
+        <flowNodeRef>Task_CustomsHold</flowNodeRef>
+        <flowNodeRef>GW_CustomsClearance</flowNodeRef>
+        <flowNodeRef>Task_LineHaul</flowNodeRef>
+        <flowNodeRef>Task_ScanGap</flowNodeRef>
+        <flowNodeRef>GW_ScanResolved</flowNodeRef>
+        <flowNodeRef>Task_ManualReconciliation</flowNodeRef>
+      </lane>
+      <lane id="Lane_DeliveryAgent" name="Delivery Agent">
+        <flowNodeRef>Task_OutForDelivery</flowNodeRef>
+        <flowNodeRef>Task_DeliverParcel</flowNodeRef>
+        <flowNodeRef>GW_DeliverySuccess</flowNodeRef>
+        <flowNodeRef>Task_ReturnToDepot</flowNodeRef>
+        <flowNodeRef>GW_RetryDelivery</flowNodeRef>
+        <flowNodeRef>Task_ReturnToSender</flowNodeRef>
+        <flowNodeRef>BoundaryTimer_DeliveryAttempt</flowNodeRef>
+        <flowNodeRef>EndEvent_ReturnedToSender</flowNodeRef>
+      </lane>
+      <lane id="Lane_Recipient" name="Recipient">
+        <flowNodeRef>Task_NotifyRecipient</flowNodeRef>
+        <flowNodeRef>GW_RecipientAvailable</flowNodeRef>
+        <flowNodeRef>GW_CODPayment</flowNodeRef>
+        <flowNodeRef>Task_ProvidePOD</flowNodeRef>
+        <flowNodeRef>EndEvent_DeliveryRefused</flowNodeRef>
+      </lane>
+      <lane id="Lane_Claims" name="Claims Department">
+        <flowNodeRef>SubProcess_Claims</flowNodeRef>
+        <flowNodeRef>Task_AssessClaimDamage</flowNodeRef>
+        <flowNodeRef>Task_ProcessClaim</flowNodeRef>
+        <flowNodeRef>Task_SettleClaim</flowNodeRef>
+        <flowNodeRef>EndEvent_ClaimSettled</flowNodeRef>
+      </lane>
+    </laneSet>
+
+    <!-- ========== START EVENT ========== -->
+    <startEvent id="StartEvent_BookShipment" name="Shipper Books Shipment">
+      <outgoing>SF_Start_Book</outgoing>
+    </startEvent>
+
+    <!-- ========== SHIPPER LANE ========== -->
+    <userTask id="Task_BookShipment" name="Book Shipment and Provide Shipment Details">
+      <incoming>SF_Start_Book</incoming>
+      <outgoing>SF_Book_Validate</outgoing>
+    </userTask>
+
+    <userTask id="Task_CancelShipment" name="Request Shipment Cancellation (E10)">
+      <incoming>SF_CancelRequest</incoming>
+      <outgoing>SF_Cancel_Process</outgoing>
+    </userTask>
+
+    <intermediateCatchEvent id="IntermediateCatch_CustomsDocs" name="Receive and Submit Customs Documents (E6)">
+      <incoming>SF_CustomsHold_WaitDocs</incoming>
+      <outgoing>SF_CustomsDocs_Provide</outgoing>
+      <messageEventDefinition id="MsgDef_CustomsDocs" messageRef="Msg_CustomsDocs" />
+    </intermediateCatchEvent>
+
+    <userTask id="Task_ProvideCustomsDocs" name="Provide Missing Customs Documentation (E6)">
+      <incoming>SF_CustomsDocs_Provide</incoming>
+      <outgoing>SF_CustomsDocs_Submitted</outgoing>
+    </userTask>
+
+    <endEvent id="EndEvent_Cancelled" name="Shipment Cancelled - Process Ended (E10)">
+      <incoming>SF_ProcessCancel_End</incoming>
+    </endEvent>
+
+    <endEvent id="EndEvent_RefundIssued" name="Shipment Cancelled - Refund Issued (E10)">
+      <incoming>SF_Refund_End</incoming>
+    </endEvent>
+
+    <!-- ========== CONTROL TOWER LANE ========== -->
+    <serviceTask id="Task_ValidateShipment" name="Validate Address Weight and Service Type (E2)">
+      <incoming>SF_Book_Validate</incoming>
+      <outgoing>SF_Validate_GW</outgoing>
+    </serviceTask>
+
+    <exclusiveGateway id="GW_ValidationOK" name="Shipment Details Valid? (E2)">
+      <incoming>SF_Validate_GW</incoming>
+      <outgoing>SF_Valid_Charges</outgoing>
+      <outgoing>SF_Invalid_Return</outgoing>
+    </exclusiveGateway>
+
+    <serviceTask id="Task_CalculateCharges" name="Calculate Shipping Charges and Generate AWB">
+      <incoming>SF_Valid_Charges</incoming>
+      <outgoing>SF_Charges_Schedule</outgoing>
+    </serviceTask>
+
+    <userTask id="Task_SchedulePickup" name="Schedule Pickup and Assign Pickup Agent">
+      <incoming>SF_Charges_Schedule</incoming>
+      <outgoing>SF_Schedule_AssignDriver</outgoing>
+    </userTask>
+
+    <serviceTask id="Task_TrackShipment" name="Track Shipment and Send Status Notifications (E9)">
+      <incoming>SF_LineHaul_Track</incoming>
+      <outgoing>SF_Track_OutDelivery</outgoing>
+    </serviceTask>
+
+    <boundaryEvent id="BoundaryTimer_TransitSLA" name="Transit SLA Breached (E5)" attachedToRef="Task_TrackShipment" cancelActivity="false">
+      <outgoing>SF_TransitDelay_Handle</outgoing>
+      <timerEventDefinition id="TimerDef_TransitSLA">
+        <timeDuration>P2D</timeDuration>
+      </timerEventDefinition>
+    </boundaryEvent>
+
+    <userTask id="Task_HandleTransitDelay" name="Handle Transit Delay - Contact Carrier and Update ETA (E5)">
+      <incoming>SF_TransitDelay_Handle</incoming>
+      <outgoing>SF_TransitDelay_Notify</outgoing>
+    </userTask>
+
+    <userTask id="Task_OpenLostTrace" name="Open Lost Parcel Tracing Case (E4)">
+      <incoming>SF_Lost_Trace</incoming>
+      <outgoing>SF_Trace_Escalate</outgoing>
+    </userTask>
+
+    <userTask id="Task_EscalateLost" name="Escalate Lost Parcel - Initiate Claims Process (E4)">
+      <incoming>SF_Trace_Escalate</incoming>
+      <outgoing>SF_Escalate_Claims</outgoing>
+    </userTask>
+
+    <userTask id="Task_ProcessCancellation" name="Process Cancellation Request (E10)">
+      <incoming>SF_Cancel_Process</incoming>
+      <outgoing>SF_ProcessCancel_GW</outgoing>
+    </userTask>
+
+    <exclusiveGateway id="GW_CancellationFeasible" name="Cancellation Feasible? (E10)">
+      <incoming>SF_ProcessCancel_GW</incoming>
+      <outgoing>SF_CancelOK_Refund</outgoing>
+      <outgoing>SF_CancelFail_Dispatch</outgoing>
+    </exclusiveGateway>
+
+    <userTask id="Task_IssueRefund" name="Issue Refund or Credit to Customer (E10)">
+      <incoming>SF_CancelOK_Refund</incoming>
+      <outgoing>SF_Refund_End</outgoing>
+    </userTask>
+
+    <userTask id="Task_CloseShipment" name="Close Shipment Record and Generate Invoice">
+      <incoming>SF_POD_Close</incoming>
+      <outgoing>SF_Close_Delivered</outgoing>
+    </userTask>
+
+    <endEvent id="EndEvent_Delivered" name="Shipment Delivered and Closed - SUCCESS">
+      <incoming>SF_Close_Delivered</incoming>
+    </endEvent>
+
+    <endEvent id="EndEvent_Lost" name="Shipment Lost - Claims Process Initiated (E4)">
+      <incoming>SF_Escalate_LostEnd</incoming>
+    </endEvent>
+
+    <!-- ========== PICKUP AGENT LANE ========== -->
+    <userTask id="Task_AssignDriver" name="Assign Pickup Driver and Route">
+      <incoming>SF_Schedule_AssignDriver</incoming>
+      <outgoing>SF_AssignDriver_Collect</outgoing>
+    </userTask>
+
+    <userTask id="Task_CollectAndScan" name="Collect Parcel and Scan Barcode at Pickup (E1/E3)">
+      <incoming>SF_AssignDriver_Collect</incoming>
+      <outgoing>SF_Collect_GW</outgoing>
+    </userTask>
+
+    <exclusiveGateway id="GW_PickupSuccess" name="Pickup Successful? (E1)">
+      <incoming>SF_Collect_GW</incoming>
+      <outgoing>SF_PickupOK_DamageCheck</outgoing>
+      <outgoing>SF_PickupFail_Reschedule</outgoing>
+    </exclusiveGateway>
+
+    <userTask id="Task_ReschedulePickup" name="Reschedule Pickup Attempt (E1)">
+      <incoming>SF_PickupFail_Reschedule</incoming>
+      <outgoing>SF_Reschedule_Retry</outgoing>
+    </userTask>
+
+    <boundaryEvent id="BoundaryTimer_PickupRetry" name="Max Pickup Attempts Exceeded (E1)" attachedToRef="Task_CollectAndScan" cancelActivity="false">
+      <outgoing>SF_PickupMaxRetry_End</outgoing>
+      <timerEventDefinition id="TimerDef_PickupRetry">
+        <timeCycle>R3/P1D</timeCycle>
+      </timerEventDefinition>
+    </boundaryEvent>
+
+    <exclusiveGateway id="GW_PickupRetryOK" name="Retry Successful? (E1)">
+      <incoming>SF_Reschedule_Retry</incoming>
+      <outgoing>SF_RetryOK_Collect</outgoing>
+      <outgoing>SF_RetryFail_End</outgoing>
+    </exclusiveGateway>
+
+    <userTask id="Task_ReportDamageAtPickup" name="Report Damage Found at Pickup (E3)">
+      <incoming>SF_PickupOK_DamageCheck</incoming>
+      <outgoing>SF_DamageReport_GW</outgoing>
+    </userTask>
+
+    <exclusiveGateway id="GW_DamageAtPickup" name="Parcel Damaged at Pickup? (E3)">
+      <incoming>SF_DamageReport_GW</incoming>
+      <outgoing>SF_NoDamage_Hub</outgoing>
+      <outgoing>SF_Damage_Claims</outgoing>
+    </exclusiveGateway>
+
+    <endEvent id="EndEvent_PickupFailed" name="Pickup Failed After Max Attempts (E1)">
+      <incoming>SF_RetryFail_End</incoming>
+      <incoming>SF_PickupMaxRetry_End</incoming>
+    </endEvent>
+
+    <!-- ========== HUB LANE ========== -->
+    <serviceTask id="Task_HubSort" name="Hub Sorting and Scanning on Arrival">
+      <incoming>SF_NoDamage_Hub</incoming>
+      <outgoing>SF_HubSort_Inspect</outgoing>
+    </serviceTask>
+
+    <userTask id="Task_InspectParcel" name="Inspect Parcel Condition at Hub (E3)">
+      <incoming>SF_HubSort_Inspect</incoming>
+      <outgoing>SF_Inspect_GW</outgoing>
+    </userTask>
+
+    <exclusiveGateway id="GW_ParcelCondition" name="Parcel Condition OK? (E3)">
+      <incoming>SF_Inspect_GW</incoming>
+      <outgoing>SF_ConditionOK_Customs</outgoing>
+      <outgoing>SF_ConditionFail_Isolate</outgoing>
+    </exclusiveGateway>
+
+    <userTask id="Task_IsolateParcel" name="Isolate Damaged Parcel and Initiate Claims (E3)">
+      <incoming>SF_ConditionFail_Isolate</incoming>
+      <outgoing>SF_Isolate_Claims</outgoing>
+    </userTask>
+
+    <userTask id="Task_CustomsHold" name="Place Parcel on Customs Hold and Request Documents (E6)">
+      <incoming>SF_ConditionOK_Customs</incoming>
+      <outgoing>SF_CustomsHold_GW</outgoing>
+    </userTask>
+
+    <exclusiveGateway id="GW_CustomsNeeded" name="Customs Clearance Required? (E6)">
+      <incoming>SF_CustomsHold_GW</incoming>
+      <outgoing>SF_CustomsYes_Hold</outgoing>
+      <outgoing>SF_CustomsNo_LineHaul</outgoing>
+    </exclusiveGateway>
+
+    <intermediateCatchEvent id="Task_CustomsHold_Wait" name="Wait for Customs Clearance (E6)">
+      <incoming>SF_CustomsYes_Hold</incoming>
+      <incoming>SF_CustomsDocs_Submitted</incoming>
+      <outgoing>SF_CustomsClear_LineHaul</outgoing>
+      <messageEventDefinition id="MsgDef_CustomsClear" messageRef="Msg_CustomsClearance" />
+    </intermediateCatchEvent>
+
+    <exclusiveGateway id="GW_CustomsClearance" name="Customs Cleared? (E6)">
+      <incoming>SF_CustomsClear_LineHaul</incoming>
+      <outgoing>SF_Cleared_LineHaul</outgoing>
+      <outgoing>SF_NotCleared_Hold</outgoing>
+    </exclusiveGateway>
+
+    <serviceTask id="Task_LineHaul" name="Line Haul Transport to Destination Hub">
+      <incoming>SF_CustomsNo_LineHaul</incoming>
+      <incoming>SF_Cleared_LineHaul</incoming>
+      <outgoing>SF_LineHaul_ScanCheck</outgoing>
+    </serviceTask>
+
+    <serviceTask id="Task_ScanGap" name="Detect Scan Gap or Tracking Anomaly (E9)">
+      <incoming>SF_LineHaul_ScanCheck</incoming>
+      <outgoing>SF_ScanGap_GW</outgoing>
+    </serviceTask>
+
+    <exclusiveGateway id="GW_ScanResolved" name="Scan Gap Resolved? (E9)">
+      <incoming>SF_ScanGap_GW</incoming>
+      <outgoing>SF_ScanOK_Track</outgoing>
+      <outgoing>SF_ScanFail_Manual</outgoing>
+      <outgoing>SF_ScanLost_Trace</outgoing>
+    </exclusiveGateway>
+
+    <userTask id="Task_ManualReconciliation" name="Manual Scan Reconciliation (E9)">
+      <incoming>SF_ScanFail_Manual</incoming>
+      <outgoing>SF_Manual_Track</outgoing>
+    </userTask>
+
+    <!-- ========== DELIVERY AGENT LANE ========== -->
+    <userTask id="Task_OutForDelivery" name="Mark Out for Delivery and Load Parcel">
+      <incoming>SF_Track_OutDelivery</incoming>
+      <outgoing>SF_OutDelivery_NotifyRecip</outgoing>
+    </userTask>
+
+    <userTask id="Task_DeliverParcel" name="Attempt Delivery to Recipient Address (E7/E8)">
+      <incoming>SF_RecipAvail_Deliver</incoming>
+      <outgoing>SF_Deliver_GW</outgoing>
+    </userTask>
+
+    <boundaryEvent id="BoundaryTimer_DeliveryAttempt" name="Delivery Attempt Timeout (E7)" attachedToRef="Task_DeliverParcel" cancelActivity="false">
+      <outgoing>SF_DeliveryTimeout_Return</outgoing>
+      <timerEventDefinition id="TimerDef_DelivAttempt">
+        <timeDuration>PT30M</timeDuration>
+      </timerEventDefinition>
+    </boundaryEvent>
+
+    <exclusiveGateway id="GW_DeliverySuccess" name="Delivery Successful?">
+      <incoming>SF_Deliver_GW</incoming>
+      <outgoing>SF_DeliverOK_POD</outgoing>
+      <outgoing>SF_DeliverFail_Return</outgoing>
+    </exclusiveGateway>
+
+    <userTask id="Task_ReturnToDepot" name="Return Parcel to Depot (E7)">
+      <incoming>SF_DeliverFail_Return</incoming>
+      <incoming>SF_DeliveryTimeout_Return</incoming>
+      <outgoing>SF_ReturnDepot_GW</outgoing>
+    </userTask>
+
+    <exclusiveGateway id="GW_RetryDelivery" name="Retry Delivery? (E7)">
+      <incoming>SF_ReturnDepot_GW</incoming>
+      <outgoing>SF_RetryDeliv_Reschedule</outgoing>
+      <outgoing>SF_NoRetry_ReturnSender</outgoing>
+    </exclusiveGateway>
+
+    <userTask id="Task_ReturnToSender" name="Return Parcel to Sender (E7/E8)">
+      <incoming>SF_NoRetry_ReturnSender</incoming>
+      <incoming>SF_RefuseReturnSender</incoming>
+      <outgoing>SF_ReturnSender_End</outgoing>
+    </userTask>
+
+    <endEvent id="EndEvent_ReturnedToSender" name="Parcel Returned to Sender (E7/E8)">
+      <incoming>SF_ReturnSender_End</incoming>
+    </endEvent>
+
+    <!-- ========== RECIPIENT LANE ========== -->
+    <sendTask id="Task_NotifyRecipient" name="Send Delivery Notification to Recipient (E7)">
+      <incoming>SF_OutDelivery_NotifyRecip</incoming>
+      <outgoing>SF_Notify_GW</outgoing>
+    </sendTask>
+
+    <exclusiveGateway id="GW_RecipientAvailable" name="Recipient Available and Accepts? (E7/E8)">
+      <incoming>SF_Notify_GW</incoming>
+      <outgoing>SF_RecipAvail_Deliver</outgoing>
+      <outgoing>SF_RecipUnavail_COD</outgoing>
+    </exclusiveGateway>
+
+    <exclusiveGateway id="GW_CODPayment" name="COD Payment Made? (E8)">
+      <incoming>SF_RecipUnavail_COD</incoming>
+      <outgoing>SF_CODOk_Deliver</outgoing>
+      <outgoing>SF_CODFail_Refuse</outgoing>
+    </exclusiveGateway>
+
+    <userTask id="Task_ProvidePOD" name="Provide Proof of Delivery Signature">
+      <incoming>SF_DeliverOK_POD</incoming>
+      <outgoing>SF_POD_Close</outgoing>
+    </userTask>
+
+    <endEvent id="EndEvent_DeliveryRefused" name="Delivery Refused - Return to Sender (E8)">
+      <incoming>SF_CODFail_RefuseEnd</incoming>
+    </endEvent>
+
+    <!-- ========== CLAIMS LANE ========== -->
+    <userTask id="Task_AssessClaimDamage" name="Assess Damage or Loss Claim">
+      <incoming>SF_Damage_Claims</incoming>
+      <incoming>SF_Isolate_Claims</incoming>
+      <incoming>SF_Escalate_Claims</incoming>
+      <outgoing>SF_Assess_Process</outgoing>
+    </userTask>
+
+    <userTask id="Task_ProcessClaim" name="Process Insurance Claim">
+      <incoming>SF_Assess_Process</incoming>
+      <outgoing>SF_Process_Settle</outgoing>
+    </userTask>
+
+    <userTask id="Task_SettleClaim" name="Settle Claim and Notify Shipper">
+      <incoming>SF_Process_Settle</incoming>
+      <outgoing>SF_Settle_End</outgoing>
+    </userTask>
+
+    <endEvent id="EndEvent_ClaimSettled" name="Claim Settled - Process Ended (E3/E4)">
+      <incoming>SF_Settle_End</incoming>
+    </endEvent>
+
+    <!-- ========== SEQUENCE FLOWS ========== -->
+    <sequenceFlow id="SF_Start_Book" sourceRef="StartEvent_BookShipment" targetRef="Task_BookShipment" />
+    <sequenceFlow id="SF_Book_Validate" sourceRef="Task_BookShipment" targetRef="Task_ValidateShipment" />
+    <sequenceFlow id="SF_Validate_GW" sourceRef="Task_ValidateShipment" targetRef="GW_ValidationOK" />
+    <sequenceFlow id="SF_Valid_Charges" name="Valid" sourceRef="GW_ValidationOK" targetRef="Task_CalculateCharges" />
+    <sequenceFlow id="SF_Invalid_Return" name="Invalid Address/Weight (E2)" sourceRef="GW_ValidationOK" targetRef="Task_BookShipment" />
+    <sequenceFlow id="SF_Charges_Schedule" sourceRef="Task_CalculateCharges" targetRef="Task_SchedulePickup" />
+    <sequenceFlow id="SF_Schedule_AssignDriver" sourceRef="Task_SchedulePickup" targetRef="Task_AssignDriver" />
+    <sequenceFlow id="SF_AssignDriver_Collect" sourceRef="Task_AssignDriver" targetRef="Task_CollectAndScan" />
+    <sequenceFlow id="SF_Collect_GW" sourceRef="Task_CollectAndScan" targetRef="GW_PickupSuccess" />
+    <sequenceFlow id="SF_PickupOK_DamageCheck" name="Pickup OK" sourceRef="GW_PickupSuccess" targetRef="Task_ReportDamageAtPickup" />
+    <sequenceFlow id="SF_PickupFail_Reschedule" name="Pickup Failed (E1)" sourceRef="GW_PickupSuccess" targetRef="Task_ReschedulePickup" />
+    <sequenceFlow id="SF_Reschedule_Retry" sourceRef="Task_ReschedulePickup" targetRef="GW_PickupRetryOK" />
+    <sequenceFlow id="SF_RetryOK_Collect" name="Retry" sourceRef="GW_PickupRetryOK" targetRef="Task_CollectAndScan" />
+    <sequenceFlow id="SF_RetryFail_End" name="Max Retries Reached" sourceRef="GW_PickupRetryOK" targetRef="EndEvent_PickupFailed" />
+    <sequenceFlow id="SF_PickupMaxRetry_End" name="Timer - Max Attempts" sourceRef="BoundaryTimer_PickupRetry" targetRef="EndEvent_PickupFailed" />
+    <sequenceFlow id="SF_DamageReport_GW" sourceRef="Task_ReportDamageAtPickup" targetRef="GW_DamageAtPickup" />
+    <sequenceFlow id="SF_NoDamage_Hub" name="No Damage" sourceRef="GW_DamageAtPickup" targetRef="Task_HubSort" />
+    <sequenceFlow id="SF_Damage_Claims" name="Damaged at Pickup (E3)" sourceRef="GW_DamageAtPickup" targetRef="Task_AssessClaimDamage" />
+    <sequenceFlow id="SF_HubSort_Inspect" sourceRef="Task_HubSort" targetRef="Task_InspectParcel" />
+    <sequenceFlow id="SF_Inspect_GW" sourceRef="Task_InspectParcel" targetRef="GW_ParcelCondition" />
+    <sequenceFlow id="SF_ConditionOK_Customs" name="Condition OK" sourceRef="GW_ParcelCondition" targetRef="Task_CustomsHold" />
+    <sequenceFlow id="SF_ConditionFail_Isolate" name="Damaged at Hub (E3)" sourceRef="GW_ParcelCondition" targetRef="Task_IsolateParcel" />
+    <sequenceFlow id="SF_Isolate_Claims" sourceRef="Task_IsolateParcel" targetRef="Task_AssessClaimDamage" />
+    <sequenceFlow id="SF_CustomsHold_GW" sourceRef="Task_CustomsHold" targetRef="GW_CustomsNeeded" />
+    <sequenceFlow id="SF_CustomsNo_LineHaul" name="No Customs Required" sourceRef="GW_CustomsNeeded" targetRef="Task_LineHaul" />
+    <sequenceFlow id="SF_CustomsYes_Hold" name="Customs Hold (E6)" sourceRef="GW_CustomsNeeded" targetRef="Task_CustomsHold_Wait" />
+    <sequenceFlow id="SF_CustomsHold_WaitDocs" sourceRef="Task_CustomsHold_Wait" targetRef="IntermediateCatch_CustomsDocs" />
+    <sequenceFlow id="SF_CustomsDocs_Provide" sourceRef="IntermediateCatch_CustomsDocs" targetRef="Task_ProvideCustomsDocs" />
+    <sequenceFlow id="SF_CustomsDocs_Submitted" sourceRef="Task_ProvideCustomsDocs" targetRef="Task_CustomsHold_Wait" />
+    <sequenceFlow id="SF_CustomsClear_LineHaul" sourceRef="Task_CustomsHold_Wait" targetRef="GW_CustomsClearance" />
+    <sequenceFlow id="SF_Cleared_LineHaul" name="Cleared" sourceRef="GW_CustomsClearance" targetRef="Task_LineHaul" />
+    <sequenceFlow id="SF_NotCleared_Hold" name="Held Further" sourceRef="GW_CustomsClearance" targetRef="Task_CustomsHold" />
+    <sequenceFlow id="SF_LineHaul_ScanCheck" sourceRef="Task_LineHaul" targetRef="Task_ScanGap" />
+    <sequenceFlow id="SF_ScanGap_GW" sourceRef="Task_ScanGap" targetRef="GW_ScanResolved" />
+    <sequenceFlow id="SF_ScanOK_Track" name="Scan OK" sourceRef="GW_ScanResolved" targetRef="Task_TrackShipment" />
+    <sequenceFlow id="SF_ScanFail_Manual" name="Scan Gap (E9)" sourceRef="GW_ScanResolved" targetRef="Task_ManualReconciliation" />
+    <sequenceFlow id="SF_ScanLost_Trace" name="Parcel Lost (E4)" sourceRef="GW_ScanResolved" targetRef="Task_OpenLostTrace" />
+    <sequenceFlow id="SF_Manual_Track" sourceRef="Task_ManualReconciliation" targetRef="Task_TrackShipment" />
+    <sequenceFlow id="SF_LineHaul_Track" sourceRef="Task_ScanGap" targetRef="Task_TrackShipment" />
+    <sequenceFlow id="SF_TransitDelay_Handle" name="Transit Delay (E5)" sourceRef="BoundaryTimer_TransitSLA" targetRef="Task_HandleTransitDelay" />
+    <sequenceFlow id="SF_TransitDelay_Notify" sourceRef="Task_HandleTransitDelay" targetRef="Task_TrackShipment" />
+    <sequenceFlow id="SF_Track_OutDelivery" sourceRef="Task_TrackShipment" targetRef="Task_OutForDelivery" />
+    <sequenceFlow id="SF_OutDelivery_NotifyRecip" sourceRef="Task_OutForDelivery" targetRef="Task_NotifyRecipient" />
+    <sequenceFlow id="SF_Notify_GW" sourceRef="Task_NotifyRecipient" targetRef="GW_RecipientAvailable" />
+    <sequenceFlow id="SF_RecipAvail_Deliver" name="Available and Ready" sourceRef="GW_RecipientAvailable" targetRef="Task_DeliverParcel" />
+    <sequenceFlow id="SF_RecipUnavail_COD" name="Unavailable or COD Issue (E7/E8)" sourceRef="GW_RecipientAvailable" targetRef="GW_CODPayment" />
+    <sequenceFlow id="SF_CODOk_Deliver" name="COD OK / Unavailable - Leave Notice" sourceRef="GW_CODPayment" targetRef="Task_DeliverParcel" />
+    <sequenceFlow id="SF_CODFail_Refuse" name="COD Refused (E8)" sourceRef="GW_CODPayment" targetRef="Task_ReturnToSender" />
+    <sequenceFlow id="SF_CODFail_RefuseEnd" sourceRef="GW_CODPayment" targetRef="EndEvent_DeliveryRefused" />
+    <sequenceFlow id="SF_Deliver_GW" sourceRef="Task_DeliverParcel" targetRef="GW_DeliverySuccess" />
+    <sequenceFlow id="SF_DeliverOK_POD" name="Delivered" sourceRef="GW_DeliverySuccess" targetRef="Task_ProvidePOD" />
+    <sequenceFlow id="SF_DeliverFail_Return" name="Failed (E7)" sourceRef="GW_DeliverySuccess" targetRef="Task_ReturnToDepot" />
+    <sequenceFlow id="SF_DeliveryTimeout_Return" name="Timeout (E7)" sourceRef="BoundaryTimer_DeliveryAttempt" targetRef="Task_ReturnToDepot" />
+    <sequenceFlow id="SF_ReturnDepot_GW" sourceRef="Task_ReturnToDepot" targetRef="GW_RetryDelivery" />
+    <sequenceFlow id="SF_RetryDeliv_Reschedule" name="Retry Delivery" sourceRef="GW_RetryDelivery" targetRef="Task_NotifyRecipient" />
+    <sequenceFlow id="SF_NoRetry_ReturnSender" name="No Retry - Return to Sender" sourceRef="GW_RetryDelivery" targetRef="Task_ReturnToSender" />
+    <sequenceFlow id="SF_RefuseReturnSender" sourceRef="Task_ReturnToSender" targetRef="Task_ReturnToSender" />
+    <sequenceFlow id="SF_ReturnSender_End" sourceRef="Task_ReturnToSender" targetRef="EndEvent_ReturnedToSender" />
+    <sequenceFlow id="SF_POD_Close" sourceRef="Task_ProvidePOD" targetRef="Task_CloseShipment" />
+    <sequenceFlow id="SF_Close_Delivered" sourceRef="Task_CloseShipment" targetRef="EndEvent_Delivered" />
+    <sequenceFlow id="SF_Trace_Escalate" sourceRef="Task_OpenLostTrace" targetRef="Task_EscalateLost" />
+    <sequenceFlow id="SF_Escalate_Claims" sourceRef="Task_EscalateLost" targetRef="Task_AssessClaimDamage" />
+    <sequenceFlow id="SF_Escalate_LostEnd" sourceRef="Task_EscalateLost" targetRef="EndEvent_Lost" />
+    <sequenceFlow id="SF_Lost_Trace" sourceRef="GW_ScanResolved" targetRef="Task_OpenLostTrace" />
+    <sequenceFlow id="SF_Assess_Process" sourceRef="Task_AssessClaimDamage" targetRef="Task_ProcessClaim" />
+    <sequenceFlow id="SF_Process_Settle" sourceRef="Task_ProcessClaim" targetRef="Task_SettleClaim" />
+    <sequenceFlow id="SF_Settle_End" sourceRef="Task_SettleClaim" targetRef="EndEvent_ClaimSettled" />
+    <sequenceFlow id="SF_CancelRequest" sourceRef="Task_BookShipment" targetRef="Task_CancelShipment" />
+    <sequenceFlow id="SF_Cancel_Process" sourceRef="Task_CancelShipment" targetRef="Task_ProcessCancellation" />
+    <sequenceFlow id="SF_ProcessCancel_GW" sourceRef="Task_ProcessCancellation" targetRef="GW_CancellationFeasible" />
+    <sequenceFlow id="SF_CancelOK_Refund" name="Cancellation Allowed" sourceRef="GW_CancellationFeasible" targetRef="Task_IssueRefund" />
+    <sequenceFlow id="SF_CancelFail_Dispatch" name="Already Dispatched - Cannot Cancel" sourceRef="GW_CancellationFeasible" targetRef="Task_TrackShipment" />
+    <sequenceFlow id="SF_Refund_End" sourceRef="Task_IssueRefund" targetRef="EndEvent_RefundIssued" />
+    <sequenceFlow id="SF_ProcessCancel_End" sourceRef="Task_ProcessCancellation" targetRef="EndEvent_Cancelled" />
+
+  </process>
+
+  <!-- Messages -->
+  <message id="Msg_CustomsDocs" name="CustomsDocuments" />
+  <message id="Msg_CustomsClearance" name="CustomsClearance" />
+
+  <!-- ==================== BPMN DI ==================== -->
+  <bpmndi:BPMNDiagram id="BPMNDiagram_A2">
+    <bpmndi:BPMNPlane id="BPMNPlane_A2" bpmnElement="Collaboration_Assignment2">
+
+      <!-- Pool -->
+      <bpmndi:BPMNShape id="Shape_Pool_A2" bpmnElement="Pool_Logistics" isHorizontal="true">
+        <dc:Bounds x="100" y="40" width="2800" height="1200" />
+      </bpmndi:BPMNShape>
+
+      <!-- Lanes -->
+      <bpmndi:BPMNShape id="Shape_Ln_Shipper" bpmnElement="Lane_Shipper" isHorizontal="true">
+        <dc:Bounds x="130" y="40" width="2770" height="160" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Ln_CT" bpmnElement="Lane_ControlTower" isHorizontal="true">
+        <dc:Bounds x="130" y="200" width="2770" height="180" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Ln_PA" bpmnElement="Lane_PickupAgent" isHorizontal="true">
+        <dc:Bounds x="130" y="380" width="2770" height="200" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Ln_Hub" bpmnElement="Lane_Hub" isHorizontal="true">
+        <dc:Bounds x="130" y="580" width="2770" height="200" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Ln_DA" bpmnElement="Lane_DeliveryAgent" isHorizontal="true">
+        <dc:Bounds x="130" y="780" width="2770" height="200" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Ln_Recip" bpmnElement="Lane_Recipient" isHorizontal="true">
+        <dc:Bounds x="130" y="980" width="2770" height="140" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Ln_Claims" bpmnElement="Lane_Claims" isHorizontal="true">
+        <dc:Bounds x="130" y="1120" width="2770" height="120" />
+      </bpmndi:BPMNShape>
+
+      <!-- START -->
+      <bpmndi:BPMNShape id="Shape_Start_A2" bpmnElement="StartEvent_BookShipment">
+        <dc:Bounds x="182" y="101" width="36" height="36" />
+        <bpmndi:BPMNLabel><dc:Bounds x="160" y="144" width="80" height="28" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <!-- Shipper tasks -->
+      <bpmndi:BPMNShape id="Shape_Book" bpmnElement="Task_BookShipment">
+        <dc:Bounds x="268" y="79" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Cancel" bpmnElement="Task_CancelShipment">
+        <dc:Bounds x="468" y="79" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_CatchCustoms" bpmnElement="IntermediateCatch_CustomsDocs">
+        <dc:Bounds x="1768" y="101" width="36" height="36" />
+        <bpmndi:BPMNLabel><dc:Bounds x="1744" y="144" width="84" height="40" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_ProvideCustoms" bpmnElement="Task_ProvideCustomsDocs">
+        <dc:Bounds x="1858" y="79" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_EndCancelled" bpmnElement="EndEvent_Cancelled">
+        <dc:Bounds x="668" y="101" width="36" height="36" />
+        <bpmndi:BPMNLabel><dc:Bounds x="643" y="144" width="86" height="28" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_EndRefund" bpmnElement="EndEvent_RefundIssued">
+        <dc:Bounds x="868" y="101" width="36" height="36" />
+        <bpmndi:BPMNLabel><dc:Bounds x="843" y="144" width="86" height="28" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <!-- Control Tower tasks -->
+      <bpmndi:BPMNShape id="Shape_Validate" bpmnElement="Task_ValidateShipment">
+        <dc:Bounds x="268" y="259" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_GW_Valid" bpmnElement="GW_ValidationOK" isMarkerVisible="true">
+        <dc:Bounds x="458" y="279" width="50" height="50" />
+        <bpmndi:BPMNLabel><dc:Bounds x="438" y="334" width="90" height="28" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Charges" bpmnElement="Task_CalculateCharges">
+        <dc:Bounds x="568" y="259" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Schedule" bpmnElement="Task_SchedulePickup">
+        <dc:Bounds x="768" y="259" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Track" bpmnElement="Task_TrackShipment">
+        <dc:Bounds x="2068" y="259" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_BTimer_Transit" bpmnElement="BoundaryTimer_TransitSLA">
+        <dc:Bounds x="2120" y="321" width="36" height="36" />
+        <bpmndi:BPMNLabel><dc:Bounds x="2100" y="362" width="76" height="28" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_HandleDelay" bpmnElement="Task_HandleTransitDelay">
+        <dc:Bounds x="2268" y="259" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_LostTrace" bpmnElement="Task_OpenLostTrace">
+        <dc:Bounds x="1668" y="259" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_EscalateLost" bpmnElement="Task_EscalateLost">
+        <dc:Bounds x="1868" y="259" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_ProcessCancel" bpmnElement="Task_ProcessCancellation">
+        <dc:Bounds x="568" y="259" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Refund" bpmnElement="Task_IssueRefund">
+        <dc:Bounds x="768" y="259" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_GW_Cancel" bpmnElement="GW_CancellationFeasible" isMarkerVisible="true">
+        <dc:Bounds x="718" y="279" width="50" height="50" />
+        <bpmndi:BPMNLabel><dc:Bounds x="698" y="334" width="90" height="28" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_CloseShip" bpmnElement="Task_CloseShipment">
+        <dc:Bounds x="2468" y="259" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_EndDelivered" bpmnElement="EndEvent_Delivered">
+        <dc:Bounds x="2668" y="281" width="36" height="36" />
+        <bpmndi:BPMNLabel><dc:Bounds x="2643" y="324" width="86" height="28" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_EndLost" bpmnElement="EndEvent_Lost">
+        <dc:Bounds x="2068" y="281" width="36" height="36" />
+        <bpmndi:BPMNLabel><dc:Bounds x="2043" y="324" width="86" height="28" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <!-- Pickup Agent tasks -->
+      <bpmndi:BPMNShape id="Shape_AssignDriver" bpmnElement="Task_AssignDriver">
+        <dc:Bounds x="968" y="439" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Collect" bpmnElement="Task_CollectAndScan">
+        <dc:Bounds x="1168" y="439" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_BTimer_PickupRetry" bpmnElement="BoundaryTimer_PickupRetry">
+        <dc:Bounds x="1220" y="501" width="36" height="36" />
+        <bpmndi:BPMNLabel><dc:Bounds x="1200" y="542" width="76" height="40" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_GW_Pickup" bpmnElement="GW_PickupSuccess" isMarkerVisible="true">
+        <dc:Bounds x="1358" y="459" width="50" height="50" />
+        <bpmndi:BPMNLabel><dc:Bounds x="1338" y="514" width="90" height="28" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Reschedule" bpmnElement="Task_ReschedulePickup">
+        <dc:Bounds x="1168" y="549" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_GW_Retry" bpmnElement="GW_PickupRetryOK" isMarkerVisible="true">
+        <dc:Bounds x="1068" y="569" width="50" height="50" />
+        <bpmndi:BPMNLabel><dc:Bounds x="1048" y="624" width="90" height="28" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_DamageReport" bpmnElement="Task_ReportDamageAtPickup">
+        <dc:Bounds x="1468" y="439" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_GW_Damage" bpmnElement="GW_DamageAtPickup" isMarkerVisible="true">
+        <dc:Bounds x="1658" y="459" width="50" height="50" />
+        <bpmndi:BPMNLabel><dc:Bounds x="1638" y="514" width="90" height="28" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_EndPickupFail" bpmnElement="EndEvent_PickupFailed">
+        <dc:Bounds x="968" y="571" width="36" height="36" />
+        <bpmndi:BPMNLabel><dc:Bounds x="943" y="612" width="86" height="40" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <!-- Hub tasks -->
+      <bpmndi:BPMNShape id="Shape_HubSort" bpmnElement="Task_HubSort">
+        <dc:Bounds x="1768" y="639" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Inspect" bpmnElement="Task_InspectParcel">
+        <dc:Bounds x="1968" y="639" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_GW_Condition" bpmnElement="GW_ParcelCondition" isMarkerVisible="true">
+        <dc:Bounds x="2158" y="659" width="50" height="50" />
+        <bpmndi:BPMNLabel><dc:Bounds x="2138" y="714" width="90" height="28" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Isolate" bpmnElement="Task_IsolateParcel">
+        <dc:Bounds x="2258" y="639" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_CustomsHold" bpmnElement="Task_CustomsHold">
+        <dc:Bounds x="1568" y="639" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_GW_CustomsNeeded" bpmnElement="GW_CustomsNeeded" isMarkerVisible="true">
+        <dc:Bounds x="1468" y="659" width="50" height="50" />
+        <bpmndi:BPMNLabel><dc:Bounds x="1448" y="714" width="90" height="28" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_CustomsWait" bpmnElement="Task_CustomsHold_Wait">
+        <dc:Bounds x="1668" y="661" width="36" height="36" />
+        <bpmndi:BPMNLabel><dc:Bounds x="1644" y="704" width="84" height="28" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_GW_CustomsClear" bpmnElement="GW_CustomsClearance" isMarkerVisible="true">
+        <dc:Bounds x="1368" y="659" width="50" height="50" />
+        <bpmndi:BPMNLabel><dc:Bounds x="1348" y="714" width="90" height="28" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_LineHaul" bpmnElement="Task_LineHaul">
+        <dc:Bounds x="1268" y="639" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_ScanGap" bpmnElement="Task_ScanGap">
+        <dc:Bounds x="1068" y="639" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_GW_Scan" bpmnElement="GW_ScanResolved" isMarkerVisible="true">
+        <dc:Bounds x="968" y="659" width="50" height="50" />
+        <bpmndi:BPMNLabel><dc:Bounds x="948" y="714" width="90" height="28" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_ManualRecon" bpmnElement="Task_ManualReconciliation">
+        <dc:Bounds x="868" y="639" width="140" height="80" />
+      </bpmndi:BPMNShape>
+
+      <!-- Delivery Agent tasks -->
+      <bpmndi:BPMNShape id="Shape_OutDeliv" bpmnElement="Task_OutForDelivery">
+        <dc:Bounds x="2168" y="839" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_Deliver" bpmnElement="Task_DeliverParcel">
+        <dc:Bounds x="2468" y="839" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_BTimer_Delivery" bpmnElement="BoundaryTimer_DeliveryAttempt">
+        <dc:Bounds x="2520" y="901" width="36" height="36" />
+        <bpmndi:BPMNLabel><dc:Bounds x="2500" y="942" width="76" height="40" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_GW_Deliver" bpmnElement="GW_DeliverySuccess" isMarkerVisible="true">
+        <dc:Bounds x="2668" y="859" width="50" height="50" />
+        <bpmndi:BPMNLabel><dc:Bounds x="2648" y="914" width="90" height="28" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_ReturnDepot" bpmnElement="Task_ReturnToDepot">
+        <dc:Bounds x="2368" y="839" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_GW_Retry_Deliv" bpmnElement="GW_RetryDelivery" isMarkerVisible="true">
+        <dc:Bounds x="2268" y="859" width="50" height="50" />
+        <bpmndi:BPMNLabel><dc:Bounds x="2248" y="914" width="90" height="28" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_ReturnSender" bpmnElement="Task_ReturnToSender">
+        <dc:Bounds x="2168" y="939" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_EndRetSender" bpmnElement="EndEvent_ReturnedToSender">
+        <dc:Bounds x="2368" y="961" width="36" height="36" />
+        <bpmndi:BPMNLabel><dc:Bounds x="2343" y="1004" width="86" height="28" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <!-- Recipient tasks -->
+      <bpmndi:BPMNShape id="Shape_NotifyRecip" bpmnElement="Task_NotifyRecipient">
+        <dc:Bounds x="2268" y="1039" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_GW_RecipAvail" bpmnElement="GW_RecipientAvailable" isMarkerVisible="true">
+        <dc:Bounds x="2468" y="1059" width="50" height="50" />
+        <bpmndi:BPMNLabel><dc:Bounds x="2448" y="1114" width="90" height="40" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_GW_COD" bpmnElement="GW_CODPayment" isMarkerVisible="true">
+        <dc:Bounds x="2568" y="1059" width="50" height="50" />
+        <bpmndi:BPMNLabel><dc:Bounds x="2548" y="1114" width="90" height="28" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_POD" bpmnElement="Task_ProvidePOD">
+        <dc:Bounds x="2668" y="1039" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_EndRefused" bpmnElement="EndEvent_DeliveryRefused">
+        <dc:Bounds x="2668" y="1061" width="36" height="36" />
+        <bpmndi:BPMNLabel><dc:Bounds x="2643" y="1104" width="86" height="40" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+      <!-- Claims tasks -->
+      <bpmndi:BPMNShape id="Shape_AssessClaim" bpmnElement="Task_AssessClaimDamage">
+        <dc:Bounds x="1868" y="1149" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_ProcessClaim" bpmnElement="Task_ProcessClaim">
+        <dc:Bounds x="2068" y="1149" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_SettleClaim" bpmnElement="Task_SettleClaim">
+        <dc:Bounds x="2268" y="1149" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Shape_EndClaim" bpmnElement="EndEvent_ClaimSettled">
+        <dc:Bounds x="2468" y="1171" width="36" height="36" />
+        <bpmndi:BPMNLabel><dc:Bounds x="2443" y="1214" width="86" height="28" /></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>
