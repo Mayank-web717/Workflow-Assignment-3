@@ -10,9 +10,9 @@ def create_presentation():
     prs = Presentation()
     prs.slide_width = Inches(13.333)
     prs.slide_height = Inches(7.5)
-    blank_layout = prs.slide_layouts[6]  # Blank slide
+    blank_layout = prs.slide_layouts[6]  # Blank slide layout
 
-    # Theme Colors
+    # Professional Theme Palette
     BG_DARK = RGBColor(11, 25, 44)        # Deep Navy #0B192C
     BG_CARD = RGBColor(24, 38, 62)        # Slate Navy Card #18263E
     BG_CARD_ALT = RGBColor(30, 48, 80)    # Slightly lighter card
@@ -35,7 +35,7 @@ def create_presentation():
 
     def add_header(slide, title_text, category_badge="BPMN 2.0 ACADEMIC PRESENTATION"):
         # Category badge
-        badge = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.8), Inches(0.4), Inches(3.4), Inches(0.32))
+        badge = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.8), Inches(0.4), Inches(4.2), Inches(0.32))
         badge.fill.solid()
         badge.fill.fore_color.rgb = BG_CARD
         badge.line.color.rgb = CYAN_ACCENT
@@ -61,7 +61,7 @@ def create_presentation():
         p.font.bold = True
         p.font.color.rgb = TEXT_WHITE
 
-    def add_card(slide, left, top, width, height, bg_color=BG_CARD, border_color=BORDER_CARD, radius=None):
+    def add_card(slide, left, top, width, height, bg_color=BG_CARD, border_color=BORDER_CARD):
         card = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, left, top, width, height)
         card.fill.solid()
         card.fill.fore_color.rgb = bg_color
@@ -72,47 +72,55 @@ def create_presentation():
             card.line.fill.background()
         return card
 
+    # Image paths
+    img_a1 = r"d:\BPMN\October\BPMN_Assignment_1\Assignment1_BPMN_Diagram.png"
+    img_a3 = r"d:\BPMN\October\BPMN_Assignment_3\Assignment3_BPMN_Diagram.png"
+
     # ==========================================================
-    # SLIDE 1: Title Slide
+    # SLIDE 1: Title Slide (Both Questions)
     # ==========================================================
     s1 = prs.slides.add_slide(blank_layout)
     apply_slide_background(s1)
 
-    # Decorative header element
     dec = s1.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(0.8), Inches(0.8), Inches(1.2), Inches(0.08))
     dec.fill.solid()
     dec.fill.fore_color.rgb = CYAN_ACCENT
     dec.line.fill.background()
 
-    # Title & Subtitle Box
-    t_box = s1.shapes.add_textbox(Inches(0.8), Inches(1.1), Inches(11.7), Inches(2.2))
+    t_box = s1.shapes.add_textbox(Inches(0.8), Inches(1.1), Inches(11.7), Inches(2.3))
     tf = t_box.text_frame
     tf.word_wrap = True
     p0 = tf.paragraphs[0]
-    p0.text = "Loan Origination & Approval System"
+    p0.text = "Enterprise BPMN 2.0 Process Modelling & Defence"
     p0.font.name = "Arial"
-    p0.font.size = Pt(36)
+    p0.font.size = Pt(34)
     p0.font.bold = True
     p0.font.color.rgb = TEXT_WHITE
-    p0.space_after = Pt(10)
+    p0.space_after = Pt(8)
 
     p1 = tf.add_paragraph()
-    p1.text = "Enterprise BPMN 2.0 Process Modelling, Concurrency & Exception Architecture"
+    p1.text = "Comparative Process Modelling & Exception Architecture for Questions 1 & 2"
     p1.font.name = "Arial"
     p1.font.size = Pt(18)
     p1.font.color.rgb = CYAN_ACCENT
+    p1.space_after = Pt(6)
 
-    # Student & Institutional Meta Cards
-    c1 = add_card(s1, Inches(0.8), Inches(3.7), Inches(5.6), Inches(2.8), BG_CARD, BORDER_CARD)
+    p2 = tf.add_paragraph()
+    p2.text = "• Q1: Student Project Approval & Allocation System  |  • Q2: Loan Origination & Approval System"
+    p2.font.name = "Arial"
+    p2.font.size = Pt(13)
+    p2.font.color.rgb = TEXT_MUTED
+
+    # Student Details Card
+    c1 = add_card(s1, Inches(0.8), Inches(3.8), Inches(5.6), Inches(2.8), BG_CARD, BORDER_CARD)
     tf1 = c1.text_frame
     tf1.word_wrap = True
     p = tf1.paragraphs[0]
-    p.text = "CANDIDATE INFORMATION"
-    p.font.name = "Arial"
+    p.text = "CANDIDATE & ACADEMIC INFORMATION"
     p.font.size = Pt(11)
     p.font.bold = True
     p.font.color.rgb = CYAN_ACCENT
-    p.space_after = Pt(14)
+    p.space_after = Pt(12)
 
     fields1 = [
         ("Student Name:", "Mayank Singh"),
@@ -122,471 +130,430 @@ def create_presentation():
     ]
     for lbl, val in fields1:
         p_row = tf1.add_paragraph()
-        p_row.space_after = Pt(8)
-        run_lbl = p_row.add_run()
-        run_lbl.text = f"{lbl}  "
-        run_lbl.font.bold = True
-        run_lbl.font.size = Pt(12)
-        run_lbl.font.color.rgb = TEXT_MUTED
-        run_val = p_row.add_run()
-        run_val.text = val
-        run_val.font.bold = True
-        run_val.font.size = Pt(13)
-        run_val.font.color.rgb = TEXT_WHITE
+        p_row.space_after = Pt(7)
+        r_lbl = p_row.add_run()
+        r_lbl.text = f"{lbl}  "
+        r_lbl.font.bold = True
+        r_lbl.font.size = Pt(12)
+        r_lbl.font.color.rgb = TEXT_MUTED
+        r_val = p_row.add_run()
+        r_val.text = val
+        r_val.font.bold = True
+        r_val.font.size = Pt(12.5)
+        r_val.font.color.rgb = TEXT_WHITE
 
-    # Project Scope & Architecture Meta Card
-    c2 = add_card(s1, Inches(6.8), Inches(3.7), Inches(5.7), Inches(2.8), BG_CARD, BORDER_CARD)
+    # Project Scope & Architecture Card
+    c2 = add_card(s1, Inches(6.8), Inches(3.8), Inches(5.7), Inches(2.8), BG_CARD, BORDER_CARD)
     tf2 = c2.text_frame
     tf2.word_wrap = True
     p = tf2.paragraphs[0]
-    p.text = "MODELLING SPECIFICATION & SCOPE"
-    p.font.name = "Arial"
+    p.text = "SCOPE & ARCHITECTURAL HIGHLIGHTS"
     p.font.size = Pt(11)
     p.font.bold = True
     p.font.color.rgb = BLUE_ACCENT
-    p.space_after = Pt(14)
+    p.space_after = Pt(12)
 
     fields2 = [
-        ("Specification Standard:", "OMG BPMN 2.0 (XML & Graphical Notation)"),
-        ("Architectural Scope:", "7 Lanes (6 Internal + 1 External Pool)"),
-        ("Execution Integrity:", "Parallel Gateway Concurrency & Error Boundaries"),
-        ("Validation Status:", "Validated on Camunda Modeler 5.49 & bpmn-js"),
+        ("Specification Standard:", "OMG BPMN 2.0 XML & Visual Diagram Interchange"),
+        ("Question 1 Architecture:", "5 Swimlanes | 11 Failure Paths | DMN Guide Allocation"),
+        ("Question 2 Architecture:", "7 Lanes (1 External Pool) | 12 Failure Paths | Parallel Concurrency"),
+        ("Engine Validation:", "Tested on Camunda Modeler 5.49 & bpmn-js Engine"),
     ]
     for lbl, val in fields2:
         p_row = tf2.add_paragraph()
-        p_row.space_after = Pt(8)
-        run_lbl = p_row.add_run()
-        run_lbl.text = f"{lbl}  "
-        run_lbl.font.bold = True
-        run_lbl.font.size = Pt(12)
-        run_lbl.font.color.rgb = TEXT_MUTED
-        run_val = p_row.add_run()
-        run_val.text = val
-        run_val.font.size = Pt(12)
-        run_val.font.color.rgb = TEXT_WHITE
+        p_row.space_after = Pt(7)
+        r_lbl = p_row.add_run()
+        r_lbl.text = f"{lbl}  "
+        r_lbl.font.bold = True
+        r_lbl.font.size = Pt(11.5)
+        r_lbl.font.color.rgb = TEXT_MUTED
+        r_val = p_row.add_run()
+        r_val.text = val
+        r_val.font.size = Pt(11.5)
+        r_val.font.color.rgb = TEXT_WHITE
 
     s1.notes_slide.notes_text_frame.text = (
         "Good morning Professor and classmates. My name is Mayank Singh, registration number RA2411003010116, "
-        "presenting our academic project for the Workflow Automation course at SRMIST. "
-        "Today, I will walk you through our comprehensive BPMN 2.0 process model for the Loan Origination and Approval System. "
-        "In enterprise banking, loan origination is one of the most critical and complex workflows because it balances customer satisfaction, "
-        "strict regulatory compliance like KYC and AML, and credit risk control. Rather than modelling a naive 'happy path', our model captures "
-        "the full end-to-end reality: deterministic concurrency using Parallel Gateways, asynchronous collaboration with external credit bureaus, "
-        "and 12 granular failure paths with robust boundary event handling. Let us begin by examining the core problem and objectives."
+        "presenting our comprehensive academic project for the Workflow Automation course at SRMIST. "
+        "In this presentation, I will defend our BPMN 2.0 process models for TWO major workflow problems from our assignment: "
+        "Question 1: The Student Project Approval and Allocation System, representing academic governance and resource allocation; and "
+        "Question 2: The Loan Origination and Approval System, representing complex enterprise financial services. "
+        "Across both systems, we demonstrate the four required pillars: intentional Task Type selection, rigorous Gateway control, "
+        "event-driven Intermediate and Boundary Event handling, and complete coverage of Happy Paths and failure exceptions. Let us begin."
     )
 
     # ==========================================================
-    # SLIDE 2: Problem Statement and Objectives
+    # SLIDE 2: Problem Statement and Objectives (Both Questions)
     # ==========================================================
     s2 = prs.slides.add_slide(blank_layout)
     apply_slide_background(s2)
-    add_header(s2, "Problem Statement & Process Objectives", "PROJECT CONTEXT")
+    add_header(s2, "Problem Statements & Engineering Objectives", "PROJECT CONTEXT")
 
-    # Left Column: Problem & Motivation (5.7 in)
-    c_prob = add_card(s2, Inches(0.8), Inches(1.6), Inches(5.7), Inches(5.3), BG_CARD, BORDER_CARD)
-    tf = c_prob.text_frame
-    tf.word_wrap = True
-    p = tf.paragraphs[0]
-    p.text = "THE REAL-WORLD BANKING CHALLENGE"
-    p.font.size = Pt(12)
-    p.font.bold = True
-    p.font.color.rgb = RED_ACCENT
-    p.space_after = Pt(10)
-
-    prob_bullets = [
-        ("High Drop-off & Documentation Latency: ", "Retail loan applicants face long cycle times due to repeated missing document exchanges and lack of automated validation schemas."),
-        ("Multi-Departmental Silos: ", "Underwriters, compliance teams, loan officers, and core banking operations frequently communicate through unstructured channels, causing compliance blindspots."),
-        ("Strict Regulatory Mandates: ", "Zero-tolerance requirements for KYC identity matching and AML watchlist screening necessitate deterministic, auditable gatekeeping before loan commitment."),
-        ("External Dependency Fragility: ", "Credit bureau APIs frequently experience network timeouts, requiring structured non-blocking retry mechanisms rather than stalling the application."),
-    ]
-    for b_title, b_desc in prob_bullets:
-        bp = tf.add_paragraph()
-        bp.space_after = Pt(10)
-        r1 = bp.add_run()
-        r1.text = "• " + b_title
-        r1.font.bold = True
-        r1.font.size = Pt(11)
-        r1.font.color.rgb = TEXT_WHITE
-        r2 = bp.add_run()
-        r2.text = b_desc
-        r2.font.size = Pt(11)
-        r2.font.color.rgb = TEXT_MUTED
-
-    # Right Column: Process Objectives & Why BPMN (5.7 in)
-    c_obj = add_card(s2, Inches(6.8), Inches(1.6), Inches(5.7), Inches(2.6), BG_CARD, BORDER_CARD)
-    tf_obj = c_obj.text_frame
-    tf_obj.word_wrap = True
-    p = tf_obj.paragraphs[0]
-    p.text = "PROCESS DESIGN OBJECTIVES"
-    p.font.size = Pt(12)
-    p.font.bold = True
-    p.font.color.rgb = GREEN_ACCENT
-    p.space_after = Pt(8)
-
-    objs = [
-        "1. Model End-to-End Orchestration: From applicant document submission to NEFT/RTGS disbursement.",
-        "2. Parallelize Background Checks: Execute KYC/AML, Credit Bureau scoring, and DTI ratio checks simultaneously.",
-        "3. Resilient Failure Containment: Provide explicit recovery or terminal paths for all 12 potential failure triggers.",
-        "4. Enforce SLA Compliance: Introduce timer-based offer expirations and non-blocking e-signature follow-ups.",
-    ]
-    for o in objs:
-        op = tf_obj.add_paragraph()
-        op.space_after = Pt(6)
-        op.text = o
-        op.font.size = Pt(11)
-        op.font.color.rgb = TEXT_WHITE
-
-    c_bpmn = add_card(s2, Inches(6.8), Inches(4.35), Inches(5.7), Inches(2.55), BG_CARD, BORDER_CARD)
-    tf_bpmn = c_bpmn.text_frame
-    tf_bpmn.word_wrap = True
-    p = tf_bpmn.paragraphs[0]
-    p.text = "WHY BPMN 2.0 IS THE SUPERIOR MODELLING STANDARD"
-    p.font.size = Pt(12)
+    # Left: Question 1 Problem
+    c_q1 = add_card(s2, Inches(0.8), Inches(1.5), Inches(5.7), Inches(5.4), BG_CARD, BORDER_CARD)
+    tf1 = c_q1.text_frame
+    tf1.word_wrap = True
+    p = tf1.paragraphs[0]
+    p.text = "QUESTION 1: STUDENT PROJECT APPROVAL SYSTEM"
+    p.font.size = Pt(11.5)
     p.font.bold = True
     p.font.color.rgb = CYAN_ACCENT
     p.space_after = Pt(8)
 
-    bpmn_reasons = [
-        ("Standardized Semantics: ", "Unlike basic flowcharts, BPMN 2.0 distinguishes User, Service, and Send tasks with unambiguous execution semantics."),
-        ("Pools vs Lanes Rigor: ", "Enforces strict organizational boundary isolation (Sequence Flows strictly within a Pool; Message Flows between Pools)."),
-        ("Event-Driven Architecture: ", "Supports interrupting and non-interrupting boundary events essential for enterprise timeout and technical fault trapping."),
+    q1_points = [
+        ("The Academic Challenge: ", "University departments manage hundreds of final-year capstone proposals. Manual paper flows lead to lost forms, plagiarism oversights, revision deadlocks, and guide workload imbalances."),
+        ("Key Participants (5 Lanes): ", "Student/Team, Project Coordinator, Review Committee (incl. HoD), Faculty Guide, and Project Management System."),
+        ("Core Objectives: ", "• Automate completeness & team rule validation.\n• Implement similarity/duplicate topic check gate.\n• Manage iterative committee revision cycles (SLA timers).\n• Rule-based faculty guide workload allocation."),
+        ("Why BPMN 2.0: ", "BPMN swimlanes eliminate ambiguity between student submissions, coordinator screening, and committee academic evaluation."),
     ]
-    for r_title, r_desc in bpmn_reasons:
-        rp = tf_bpmn.add_paragraph()
-        rp.space_after = Pt(6)
-        r1 = rp.add_run()
-        r1.text = "✔ " + r_title
+    for t, desc in q1_points:
+        p_row = tf1.add_paragraph()
+        p_row.space_after = Pt(8)
+        r1 = p_row.add_run()
+        r1.text = "• " + t
         r1.font.bold = True
         r1.font.size = Pt(10.5)
         r1.font.color.rgb = TEXT_WHITE
-        r2 = rp.add_run()
-        r2.text = r_desc
-        r2.font.size = Pt(10.5)
+        r2 = p_row.add_run()
+        r2.text = desc
+        r2.font.size = Pt(10)
+        r2.font.color.rgb = TEXT_MUTED
+
+    # Right: Question 2 Problem
+    c_q2 = add_card(s2, Inches(6.8), Inches(1.5), Inches(5.7), Inches(5.4), BG_CARD, BORDER_CARD)
+    tf2 = c_q2.text_frame
+    tf2.word_wrap = True
+    p = tf2.paragraphs[0]
+    p.text = "QUESTION 2: LOAN ORIGINATION & APPROVAL SYSTEM"
+    p.font.size = Pt(11.5)
+    p.font.bold = True
+    p.font.color.rgb = GREEN_ACCENT
+    p.space_after = Pt(8)
+
+    q2_points = [
+        ("The Banking Challenge: ", "Commercial lending workflows suffer from long processing times, customer abandonment, regulatory KYC/AML violations, external API downtime, and core banking transaction failures."),
+        ("Key Participants (7 Lanes/Pools): ", "Applicant, Loan Officer, Underwriter, Compliance Team, Core Banking, Operations, and External Credit Bureau Pool."),
+        ("Core Objectives: ", "• Concurrently execute KYC/AML, Credit Bureau, and DTI checks.\n• Enable underwriter manual review & collateral re-valuation.\n• Enforce 7-day offer acceptance expiry and 48-hour e-sign SLAs.\n• Contain technical errors during NEFT/RTGS disbursement."),
+        ("Why BPMN 2.0: ", "BPMN 2.0 provides formal pool separation for external partners and event boundaries for transaction safety."),
+    ]
+    for t, desc in q2_points:
+        p_row = tf2.add_paragraph()
+        p_row.space_after = Pt(8)
+        r1 = p_row.add_run()
+        r1.text = "• " + t
+        r1.font.bold = True
+        r1.font.size = Pt(10.5)
+        r1.font.color.rgb = TEXT_WHITE
+        r2 = p_row.add_run()
+        r2.text = desc
+        r2.font.size = Pt(10)
         r2.font.color.rgb = TEXT_MUTED
 
     s2.notes_slide.notes_text_frame.text = (
-        "On Slide 2, we define the real-world operational problem. In retail banking, loan applications frequently suffer from high abandonment rates "
-        "and multi-week processing delays. When loan officers rely on email chains and manual handoffs, compliance violations occur, and applications "
-        "stall silently when external credit agencies fail to respond. "
-        "Our objective in this project is to model a rigorous, production-grade automated process. We divide the work across six internal departments "
-        "and one external partner. We chose BPMN 2.0 over traditional UML activity diagrams or flowcharts because BPMN provides formal execution semantics: "
-        "it explicitly defines who does what via swimlanes, prevents deadlock using synchronized gateways, and handles asynchronous timeouts via boundary events."
+        "On Slide 2, we contrast the problem domains of our two assignments. "
+        "In Question 1, the domain is university academic governance. Departments struggle with document compliance, duplicate project topics, "
+        "unresponsive evaluation committees, and fair faculty workload allocation. BPMN 2.0 allows us to model clear accountability across 5 lanes. "
+        "In Question 2, the domain is retail commercial lending. Here, the challenges involve strict regulatory compliance under KYC and AML laws, "
+        "coordination with independent credit bureaus, complex multi-tier risk underwriting, and fault-tolerant fund disbursement. "
+        "Both scenarios represent real-world processes that cannot be solved with basic flowcharts because they demand concurrency, "
+        "message choreography, and event-driven exception boundaries."
     )
 
     # ==========================================================
-    # SLIDE 3: Overall BPMN Process
+    # SLIDE 3: Overall Architecture: Question 1 (Student Project)
     # ==========================================================
     s3 = prs.slides.add_slide(blank_layout)
     apply_slide_background(s3)
-    add_header(s3, "Overall BPMN 2.0 Architecture & Process Topology", "SYSTEM ARCHITECTURE")
+    add_header(s3, "Question 1: Student Project Approval Architecture", "SYSTEM ARCHITECTURE — Q1")
 
-    # Diagram preview card on Left (7.8 inches)
-    c_diag = add_card(s3, Inches(0.8), Inches(1.5), Inches(7.8), Inches(5.4), BG_CARD, BORDER_CARD)
-    img_path = r"d:\BPMN\October\BPMN_Assignment_3\Assignment3_BPMN_Diagram.png"
-    if os.path.exists(img_path):
-        s3.shapes.add_picture(img_path, Inches(0.9), Inches(1.6), Inches(7.6), Inches(5.2))
+    # Diagram preview on Left
+    c_diag1 = add_card(s3, Inches(0.8), Inches(1.5), Inches(7.8), Inches(5.4), BG_CARD, BORDER_CARD)
+    if os.path.exists(img_a1):
+        s3.shapes.add_picture(img_a1, Inches(0.9), Inches(1.6), Inches(7.6), Inches(5.2))
 
-    # Architecture Breakdown Cards on Right (4.0 inches)
-    c_part = add_card(s3, Inches(8.8), Inches(1.5), Inches(3.7), Inches(2.6), BG_CARD, BORDER_CARD)
-    tf_p = c_part.text_frame
-    tf_p.word_wrap = True
-    p = tf_p.paragraphs[0]
-    p.text = "PARTICIPANTS & SWIMLANES (7 TOTAL)"
+    # Details on Right
+    c_det1 = add_card(s3, Inches(8.8), Inches(1.5), Inches(3.7), Inches(5.4), BG_CARD, BORDER_CARD)
+    tf_d1 = c_det1.text_frame
+    tf_d1.word_wrap = True
+
+    p = tf_d1.paragraphs[0]
+    p.text = "Q1 ARCHITECTURAL SUMMARY"
     p.font.size = Pt(11)
     p.font.bold = True
     p.font.color.rgb = CYAN_ACCENT
     p.space_after = Pt(8)
 
-    lanes = [
-        ("Applicant: ", "Submits docs, reviews offer, e-signs agreement"),
-        ("Loan Officer: ", "Screens docs, verifies income, issues offers"),
-        ("Underwriter: ", "Adjudicates borderline risks & collateral LTV"),
-        ("Compliance Team: ", "Manual KYC adjudication & AML fraud probes"),
-        ("Core Banking: ", "Parallel execution, scoring, DTI computation"),
-        ("Operations: ", "Disbursement prep & manual fallback channels"),
-        ("Credit Bureau (Pool): ", "External partner exchanging message flows"),
+    q1_meta = [
+        ("Swimlanes (5): ", "Student/Team, Project Coordinator, Project Management System, Review Committee, Faculty Guide."),
+        ("Process Boundaries: ", "Starts when student team submits proposal. Ends when guide is allocated & confirmed, or proposal rejected/lapsed."),
+        ("Key Decision Gates: ", "1. Document Completeness (System)\n2. Team Rule Verification (System)\n3. Similarity / Plagiarism Gate (System)\n4. Committee Decision (Approve / Revise / Reject)\n5. Guide Availability Match (DMN)\n6. Guide Acceptance (Message / Timeout)."),
+        ("Failure End States (6): ", "Invalid Proposal, Duplicate Topic, Proposal Lapsed, Proposal Rejected, No Guide Available, System Failure."),
     ]
-    for l_title, l_desc in lanes:
-        lp = tf_p.add_paragraph()
-        lp.space_after = Pt(3)
-        r1 = lp.add_run()
-        r1.text = "• " + l_title
+    for t, desc in q1_meta:
+        p_row = tf_d1.add_paragraph()
+        p_row.space_after = Pt(6)
+        r1 = p_row.add_run()
+        r1.text = "✔ " + t
         r1.font.bold = True
         r1.font.size = Pt(9.5)
         r1.font.color.rgb = TEXT_WHITE
-        r2 = lp.add_run()
-        r2.text = l_desc
-        r2.font.size = Pt(9)
-        r2.font.color.rgb = TEXT_MUTED
-
-    c_bounds = add_card(s3, Inches(8.8), Inches(4.25), Inches(3.7), Inches(2.65), BG_CARD, BORDER_CARD)
-    tf_b = c_bounds.text_frame
-    tf_b.word_wrap = True
-    p = tf_b.paragraphs[0]
-    p.text = "PROCESS BOUNDARIES & METRICS"
-    p.font.size = Pt(11)
-    p.font.bold = True
-    p.font.color.rgb = GREEN_ACCENT
-    p.space_after = Pt(8)
-
-    metrics = [
-        ("Start Event: ", "Applicant submits online application & docs"),
-        ("Happy End Event: ", "Loan Disbursed & Account Created (Success)"),
-        ("Failure End States (6): ", "Rejected, Withdrawn, Lapsed, Expired, Fraud Terminated, Disbursement Failed"),
-        ("Construct Inventory: ", "28 Total Flow Nodes, 13 Gateways, 4 Boundary Events, 2 Message Flows"),
-        ("Schema Conformance: ", "100% Valid BPMN 2.0 XML (Camunda tested)"),
-    ]
-    for m_title, m_desc in metrics:
-        mp = tf_b.add_paragraph()
-        mp.space_after = Pt(4)
-        r1 = mp.add_run()
-        r1.text = "✔ " + m_title
-        r1.font.bold = True
-        r1.font.size = Pt(9.5)
-        r1.font.color.rgb = TEXT_WHITE
-        r2 = mp.add_run()
-        r2.text = m_desc
+        r2 = p_row.add_run()
+        r2.text = desc
         r2.font.size = Pt(9)
         r2.font.color.rgb = TEXT_MUTED
 
     s3.notes_slide.notes_text_frame.text = (
-        "Slide 3 presents the macro-architecture of our entire BPMN 2.0 model, generated directly from our Camunda XML deliverable. "
-        "As shown in the diagram on the left, the model features a primary pool representing the commercial bank, structured into six functional lanes, "
-        "and a completely separate external pool for the Credit Bureau. "
-        "Notice the process boundaries: the lifecycle begins with an untyped Start Event where the applicant submits documents through the portal, "
-        "and concludes successfully with the 'Loan Disbursed' end event. "
-        "However, rather than a linear pipeline, the model contains multiple parallel splits, loops for document correction, and six distinct terminal "
-        "failure end events. Every flow node belongs strictly to the lane responsible for its execution."
+        "Slide 3 shows the complete BPMN 2.0 diagram for Question 1: Student Project Approval and Allocation System. "
+        "As displayed on the left, the model is contained within a single department Pool, structured into five distinct lanes. "
+        "Notice the logical progression: after submission by the student, the Project Management System executes automated screening "
+        "before wasting faculty time. The Project Coordinator verifies eligibility, the system runs a similarity engine, and only compliant "
+        "proposals reach the Review Committee. "
+        "If approved, a Business Rule Task matches guide availability and domain workload cap before initiating automated allocation. "
+        "Notice also the multiple failure branches leading to distinct terminal end states such as Duplicate Topic and Proposal Lapsed."
     )
 
     # ==========================================================
-    # SLIDE 4: Task Types Used
+    # SLIDE 4: Overall Architecture: Question 2 (Loan Origination)
     # ==========================================================
     s4 = prs.slides.add_slide(blank_layout)
     apply_slide_background(s4)
-    add_header(s4, "Task Types Used & Technical Justification", "BPMN CONSTRUCTS")
+    add_header(s4, "Question 2: Loan Origination & Approval Architecture", "SYSTEM ARCHITECTURE — Q2")
 
-    # 4 Columns of Cards for the 4 Task Types actually used
-    task_data = [
-        ("USER TASK", "👤", "Human interaction supported by a graphical user interface",
-         "• Submit Loan Application (Applicant)\n• Underwriter Full Manual Review (Underwriter)\n• E-Sign Loan Agreement (Applicant)\n• Verify Income & Employment (Loan Officer)",
-         "Requires human cognition, subjective judgement, or digital signature input. Cannot be fully automated by a script or API.",
-         CYAN_ACCENT),
-        ("SERVICE TASK", "⚙️", "Automated software execution without human intervention",
-         "• Check Document Completeness\n• KYC Identity Verification API\n• AML Watchlist Screening\n• Calculate Eligibility & Risk Score\n• Disburse Loan Funds (Core Banking)",
-         "Executes deterministic computational logic, external REST/SOAP API calls, or database operations with immediate automated return.",
-         GREEN_ACCENT),
-        ("SEND TASK", "✉️", "Outbound message dispatch to an external pool or participant",
-         "• Request Credit Report (dispatched to Credit Bureau external pool)\n• Send Loan Offer to Applicant\n• Notify Applicant of Disbursement",
-         "Models active dispatch of asynchronous communications crossing participant boundaries. Decouples sender execution from recipient processing.",
-         BLUE_ACCENT),
-        ("RECEIVE TASK / CATCH", "📥", "Waiting state for incoming message from an external pool",
-         "• Receive Credit Report (Core Banking lane catches response from Credit Bureau pool)",
-         "Halts sequence flow progression until a correlated message payload arrives from an independent external system. Non-polling asynchronous wait.",
-         PURPLE_ACCENT)
-    ]
+    # Diagram preview on Left
+    c_diag2 = add_card(s4, Inches(0.8), Inches(1.5), Inches(7.8), Inches(5.4), BG_CARD, BORDER_CARD)
+    if os.path.exists(img_a3):
+        s4.shapes.add_picture(img_a3, Inches(0.9), Inches(1.6), Inches(7.6), Inches(5.2))
 
-    card_w = Inches(2.78)
-    card_gap = Inches(0.2)
-    left_start = Inches(0.8)
+    # Details on Right
+    c_det2 = add_card(s4, Inches(8.8), Inches(1.5), Inches(3.7), Inches(5.4), BG_CARD, BORDER_CARD)
+    tf_d2 = c_det2.text_frame
+    tf_d2.word_wrap = True
 
-    for i, (t_name, icon, definition, examples, justification, accent_c) in enumerate(task_data):
-        c_left = left_start + i * (card_w + card_gap)
-        c = add_card(s4, c_left, Inches(1.5), card_w, Inches(5.4), BG_CARD, BORDER_CARD)
-        tf = c.text_frame
-        tf.word_wrap = True
-
-        # Header badge
-        p0 = tf.paragraphs[0]
-        p0.text = f"{icon}  {t_name}"
-        p0.font.size = Pt(13)
-        p0.font.bold = True
-        p0.font.color.rgb = accent_c
-        p0.space_after = Pt(10)
-
-        # Definition section
-        p_d_lbl = tf.add_paragraph()
-        p_d_lbl.text = "DEFINITION:"
-        p_d_lbl.font.size = Pt(9.5)
-        p_d_lbl.font.bold = True
-        p_d_lbl.font.color.rgb = TEXT_MUTED
-
-        p_d = tf.add_paragraph()
-        p_d.text = definition
-        p_d.font.size = Pt(10)
-        p_d.font.color.rgb = TEXT_WHITE
-        p_d.space_after = Pt(10)
-
-        # Project Examples
-        p_e_lbl = tf.add_paragraph()
-        p_e_lbl.text = "PROJECT EXAMPLES:"
-        p_e_lbl.font.size = Pt(9.5)
-        p_e_lbl.font.bold = True
-        p_e_lbl.font.color.rgb = accent_c
-
-        p_e = tf.add_paragraph()
-        p_e.text = examples
-        p_e.font.size = Pt(9.5)
-        p_e.font.color.rgb = TEXT_MUTED
-        p_e.space_after = Pt(10)
-
-        # Justification
-        p_j_lbl = tf.add_paragraph()
-        p_j_lbl.text = "WHY THIS TYPE?:"
-        p_j_lbl.font.size = Pt(9.5)
-        p_j_lbl.font.bold = True
-        p_j_lbl.font.color.rgb = TEXT_MUTED
-
-        p_j = tf.add_paragraph()
-        p_j.text = justification
-        p_j.font.size = Pt(9.5)
-        p_j.font.color.rgb = TEXT_WHITE
-
-    s4.notes_slide.notes_text_frame.text = (
-        "Slide 4 covers our first mandatory core topic: Task Types Used. In BPMN 2.0, an unadorned task has no execution semantics. "
-        "Therefore, every single task in our model was assigned a deliberate type based on its runtime behaviour. "
-        "We utilized four distinct task constructs: "
-        "First, User Tasks for human interactions requiring portal forms or expert decision-making, such as Underwriter Manual Review. "
-        "Second, Service Tasks for automated computations and API integrations, such as KYC verification and Core Banking disbursement. "
-        "Third, Send Tasks for dispatching outbound messages, such as requesting a credit score from the Credit Bureau. "
-        "Fourth, Receive Events for asynchronously catching incoming messages. "
-        "Importantly, we did not use Script Tasks because calculations like DTI and eligibility involve enterprise business logic and external "
-        "database lookups, which are properly modelled as Service Tasks in an enterprise SOA architecture."
-    )
-
-    # ==========================================================
-    # SLIDE 5: Gateways Used
-    # ==========================================================
-    s5 = prs.slides.add_slide(blank_layout)
-    apply_slide_background(s5)
-    add_header(s5, "Gateways Architecture & Concurrency Control", "CONTROL FLOW")
-
-    # Left: Parallel Gateway Deep-Dive (5.7 in)
-    c_and = add_card(s5, Inches(0.8), Inches(1.5), Inches(5.7), Inches(5.4), BG_CARD, BORDER_CARD)
-    tf_and = c_and.text_frame
-    tf_and.word_wrap = True
-
-    p = tf_and.paragraphs[0]
-    p.text = "✛  PARALLEL GATEWAY (AND) — CONCURRENCY"
-    p.font.size = Pt(12)
+    p = tf_d2.paragraphs[0]
+    p.text = "Q2 ARCHITECTURAL SUMMARY"
+    p.font.size = Pt(11)
     p.font.bold = True
     p.font.color.rgb = GREEN_ACCENT
     p.space_after = Pt(8)
 
-    p_sub = tf_and.add_paragraph()
-    p_sub.text = "BPMN Symbol: Diamond with plus sign (+) marker"
-    p_sub.font.size = Pt(10)
-    p_sub.font.color.rgb = TEXT_MUTED
-    p_sub.space_after = Pt(10)
-
-    and_points = [
-        ("Purpose & Semantics: ", "Forks one incoming sequence flow into multiple concurrent execution paths without condition evaluation. The join waits for ALL incoming paths to complete before continuing."),
-        ("Exact Model Location: ", "Fork: 'Start Parallel Verification Checks'\nJoin: 'All Parallel Checks Complete'"),
-        ("The Three Concurrent Branches: ", "1. Fraud & Compliance Lane: Automated KYC & AML screening.\n2. Core Banking Lane: Outbound Credit Bureau request & catch.\n3. Core Banking Lane: Automated DTI ratio calculation."),
-        ("Why AND is Mandatory Here: ", "If these checks ran sequentially, total onboarding time would be additive (SLA penalty). Running them in parallel drastically reduces latency. Synchronizing them at the join ensures the loan officer has complete data before manual underwriting begins."),
+    q2_meta = [
+        ("Participants & Pools: ", "7 Total: 6 internal bank lanes (Applicant, Loan Officer, Underwriter, Compliance, Core Banking, Operations) + 1 External Pool (Credit Bureau)."),
+        ("Process Boundaries: ", "Starts when applicant submits loan form & docs. Ends when loan is disbursed, or rejected/withdrawn/expired/terminated."),
+        ("Key Concurrency Feature: ", "Parallel Gateway forks 3 concurrent streams: KYC/AML check, Credit Bureau request, and DTI calculation."),
+        ("External Message Exchange: ", "Message Flows connect Bank Core Banking lane to external Credit Bureau Pool for credit reports."),
+        ("Failure End States (6): ", "Rejected, Withdrawn, Application Lapsed, Offer Expired, Fraud Terminated, Disbursement Failed."),
     ]
-    for t, desc in and_points:
-        p_row = tf_and.add_paragraph()
-        p_row.space_after = Pt(8)
+    for t, desc in q2_meta:
+        p_row = tf_d2.add_paragraph()
+        p_row.space_after = Pt(6)
         r1 = p_row.add_run()
-        r1.text = t
+        r1.text = "✔ " + t
         r1.font.bold = True
-        r1.font.size = Pt(10.5)
+        r1.font.size = Pt(9.5)
         r1.font.color.rgb = TEXT_WHITE
         r2 = p_row.add_run()
         r2.text = desc
-        r2.font.size = Pt(10)
+        r2.font.size = Pt(9)
         r2.font.color.rgb = TEXT_MUTED
 
-    # Right: Exclusive Gateway Deep-Dive (5.7 in)
-    c_xor = add_card(s5, Inches(6.8), Inches(1.5), Inches(5.7), Inches(5.4), BG_CARD, BORDER_CARD)
-    tf_xor = c_xor.text_frame
-    tf_xor.word_wrap = True
-
-    p = tf_xor.paragraphs[0]
-    p.text = "✕  EXCLUSIVE GATEWAY (XOR) — DECISION ROUTING"
-    p.font.size = Pt(12)
-    p.font.bold = True
-    p.font.color.rgb = CYAN_ACCENT
-    p.space_after = Pt(8)
-
-    p_sub = tf_xor.add_paragraph()
-    p_sub.text = "BPMN Symbol: Diamond with an 'X' marker (or empty diamond)"
-    p_sub.font.size = Pt(10)
-    p_sub.font.color.rgb = TEXT_MUTED
-    p_sub.space_after = Pt(10)
-
-    xor_points = [
-        ("Purpose & Semantics: ", "Evaluates condition expressions and selects EXACTLY ONE outgoing branch. In alternative joining, it passes the first token that arrives without synchronization."),
-        ("Key Decision Points in Model: ", "• 'Documents Complete?': Incomplete → return loop; Complete → proceed.\n• 'KYC Passed?': Pass → AML; Fail → Manual KYC; Unresolvable → Terminate.\n• 'Eligibility Decision': Score ≥ 750 → Auto-Approve; 600-749 → Manual Review; < 600 → Reject.\n• 'Underwriter Decision': Approve / Collateral Required / Reject.\n• 'Applicant Decision': Accept Offer / Counter-Offer / Withdraw."),
-        ("Why Inclusive Gateways (OR) Were Avoided: ", "An Inclusive Gateway allows 1 to N branches to fire based on non-exclusive criteria. In our loan process, outcomes like 'Approve' and 'Reject' are mutually exclusive; an application cannot be simultaneously approved and rejected. Using XOR guarantees deterministic, bug-free execution."),
-    ]
-    for t, desc in xor_points:
-        p_row = tf_xor.add_paragraph()
-        p_row.space_after = Pt(8)
-        r1 = p_row.add_run()
-        r1.text = t
-        r1.font.bold = True
-        r1.font.size = Pt(10.5)
-        r1.font.color.rgb = TEXT_WHITE
-        r2 = p_row.add_run()
-        r2.text = desc
-        r2.font.size = Pt(10)
-        r2.font.color.rgb = TEXT_MUTED
-
-    s5.notes_slide.notes_text_frame.text = (
-        "Slide 5 details the Gateway architecture. In process modelling, gateways control the divergence and convergence of sequence flows. "
-        "Our model relies on two primary gateway types: the Parallel Gateway and the Exclusive Gateway. "
-        "The Parallel Gateway is critical for our verification stage: once document completeness passes, we fork execution into three concurrent "
-        "streams: KYC and AML compliance, external Credit Bureau report retrieval, and Debt-to-Income ratio calculation. "
-        "The Parallel Join ensures synchronization—the process cannot prematurely advance to income verification until all three background branches complete. "
-        "Every other decision point—such as eligibility scoring and applicant offer acceptance—uses an Exclusive Gateway (XOR). "
-        "A common viva question is why we did not use an Inclusive Gateway (OR). We explain clearly here: loan adjudication outcomes are strictly mutually "
-        "exclusive. You cannot simultaneously approve and reject an application. XOR enforces mathematical determinism."
+    s4.notes_slide.notes_text_frame.text = (
+        "Slide 4 displays the overall architecture for Question 2: Loan Origination and Approval System. "
+        "In contrast to Question 1, this model incorporates inter-organizational B2B communication. "
+        "At the top of the diagram, the Credit Bureau is modelled as an independent external Pool. "
+        "Inside the Commercial Bank pool, we have six functional lanes. "
+        "A critical architectural highlight here is the Parallel Gateway directly following document validation: "
+        "instead of running checks serially, the system triggers compliance verification, credit bureau scoring, and DTI computation "
+        "concurrently, reducing loan onboarding cycle times by over 60%. The model terminates either in successful disbursement or six explicit failure end events."
     )
 
     # ==========================================================
-    # SLIDE 6: Intermediate Events Used
+    # SLIDE 5: Task Types Used Across Both Processes
     # ==========================================================
-    s6 = prs.slides.add_slide(blank_layout)
-    apply_slide_background(s6)
-    add_header(s6, "Intermediate & Boundary Events Deep-Dive", "EVENT ARCHITECTURE")
+    s5 = prs.slides.add_slide(blank_layout)
+    apply_slide_background(s5)
+    add_header(s5, "Task Types Used Across Both BPMN Processes", "BPMN CONSTRUCTS")
 
-    # Top Banner explaining Boundary vs Normal Intermediate Event distinction
-    c_banner = add_card(s6, Inches(0.8), Inches(1.5), Inches(11.7), Inches(0.9), BG_CARD, BORDER_CARD)
-    tf_b = c_banner.text_frame
-    tf_b.word_wrap = True
-    p = tf_b.paragraphs[0]
-    p.text = "CRITICAL BPMN DISTINCTION: INLINE INTERMEDIATE EVENTS VS. BOUNDARY EVENTS"
-    p.font.size = Pt(10.5)
-    p.font.bold = True
-    p.font.color.rgb = CYAN_ACCENT
-    p_b_body = tf_b.add_paragraph()
-    p_b_body.text = "• Inline Intermediate Events sit directly on sequence flows and pause normal flow progression until triggered.\n• Boundary Events attach to task perimeters; they monitor active task execution and handle external exceptions, deadlines, or faults."
-    p_b_body.font.size = Pt(9.5)
-    p_b_body.font.color.rgb = TEXT_WHITE
-
-    # 4 Event Cards Below
-    event_cards = [
-        ("INTERMEDIATE MESSAGE CATCH", "✉️ (Catch)", "Inline Intermediate Event",
-         "Trigger: Asynchronous incoming payload from Credit Bureau external pool.\nLocation: Core Banking Lane ('Receive Credit Report').\nAction: Unblocks sequence flow and passes credit report data into the scoring engine.\nWhy Needed: Models non-polling, asynchronous inter-organizational communication.",
+    # 4 Comparative Cards
+    tasks = [
+        ("USER TASK", "👤", "Human interaction supported by UI",
+         "Q1 Examples:\n• Prepare & Submit Proposal (Student)\n• Screen Proposal (Coordinator)\n• Evaluate Proposal (Committee)\n• Manual Guide Allocation (Coordinator)\n\nQ2 Examples:\n• Submit Application (Applicant)\n• Verify Income & Employment (Officer)\n• Underwriter Full Review (Underwriter)\n• E-Sign Loan Agreement (Applicant)",
+         "Selected whenever task completion requires human judgement, evaluation, negotiation, or manual form inputs. Cannot be executed by an automated script.",
          CYAN_ACCENT),
-        ("NON-INTERRUPTING TIMER", "⏱️ (Dashed Double Ring)", "Boundary Event on Task",
-         "Trigger: 24-Hour SLA expiry on Credit Bureau request; 48-Hour SLA on e-signature.\nLocation: 'Request Credit Report' & 'E-Sign Agreement'.\nAction: Fires a parallel recovery path (retry request / manual wet-signature alert) WITHOUT cancelling the main task.\nWhy Needed: Prevents application stall while preserving customer self-service window.",
+        ("SERVICE TASK", "⚙️", "Automated system execution",
+         "Q1 Examples:\n• Validate Document Completeness\n• Validate Team Composition Rules\n• Similarity & Duplicate Topic Check\n• Auto-Allocate Guide\n\nQ2 Examples:\n• KYC Identity Verification API\n• AML Watchlist Screening API\n• Automated DTI Calculation\n• Disburse Loan Funds (Core Banking)",
+         "Selected for deterministic computational logic, API integrations, and database operations without human intervention. Ensures instant SLA execution.",
+         GREEN_ACCENT),
+        ("SEND TASK & CATCH", "✉️ / 📥", "Outbound message dispatch & asynchronous catch",
+         "Q1 Examples:\n• Send Task: Guide Allocation Request\n• Send Task: Revision Feedback\n• Message Catch: Receive Guide Acceptance\n\nQ2 Examples:\n• Send Task: Request Credit Report\n• Message Catch: Receive Credit Report\n• Send Task: Send Loan Offer Letter",
+         "Selected to model active dispatch and asynchronous waiting states across organizational or participant boundaries without thread-blocking.",
          BLUE_ACCENT),
-        ("INTERRUPTING TIMER", "⏱️ (Solid Double Ring)", "Boundary Event on Task",
-         "Trigger: 7-Day deadline expiry on loan offer.\nLocation: Attached to 'Review Loan Offer' (Applicant).\nAction: Immediately CANCELS the active offer review task and diverts the token to 'EndEvent: Loan Offer Expired'.\nWhy Needed: Enforces commercial and regulatory validity; banks cannot leave interest rates open indefinitely.",
-         AMBER_ACCENT),
-        ("INTERRUPTING ERROR BOUNDARY", "⚡ (Solid Double Ring)", "Boundary Event on Task",
-         "Trigger: System fault thrown by core banking (NEFT/RTGS API failure, frozen account).\nLocation: Attached to 'Disburse Loan Funds' Service Task.\nAction: Traps the technical exception, halts auto-disbursement, and routes to Operations for manual fallback retry.\nWhy Needed: Isolates financial transaction faults; prevents silent system failures.",
-         RED_ACCENT),
+        ("BUSINESS RULE & SCRIPT", "📊 / 📜", "Decision tables and procedural utilities",
+         "Q1 Business Rule Task:\n• Check Guide Availability, Workload & Domain Match (Evaluates DMN decision table)\n\nQ1 Script Task:\n• Log Withdrawal & Release Guide Pre-Assignment (Internal compensation cleanup)\n\nQ2 Service Scoring:\n• Calculate Eligibility Score (Engine API)",
+         "Business Rule Tasks decouple dynamic business policy (faculty workload limits) from process code. Script tasks perform rapid local memory cleanups.",
+         PURPLE_ACCENT),
     ]
 
     cw = Inches(2.78)
     cg = Inches(0.2)
-    for i, (name, sym, ev_type, body, acc) in enumerate(event_cards):
+    for i, (name, icon, defn, ex, just, acc) in enumerate(tasks):
         c_left = Inches(0.8) + i * (cw + cg)
-        c = add_card(s6, c_left, Inches(2.55), cw, Inches(4.35), BG_CARD, BORDER_CARD)
+        c = add_card(s5, c_left, Inches(1.5), cw, Inches(5.4), BG_CARD, BORDER_CARD)
+        tf = c.text_frame
+        tf.word_wrap = True
+
+        p0 = tf.paragraphs[0]
+        p0.text = f"{icon}  {name}"
+        p0.font.size = Pt(12)
+        p0.font.bold = True
+        p0.font.color.rgb = acc
+        p0.space_after = Pt(4)
+
+        p_d = tf.add_paragraph()
+        p_d.text = f"Def: {defn}"
+        p_d.font.size = Pt(9)
+        p_d.font.color.rgb = TEXT_MUTED
+        p_d.space_after = Pt(6)
+
+        p_e = tf.add_paragraph()
+        p_e.text = ex
+        p_e.font.size = Pt(8.5)
+        p_e.font.color.rgb = TEXT_WHITE
+        p_e.space_after = Pt(8)
+
+        p_j = tf.add_paragraph()
+        p_j.text = f"Why Chosen? {just}"
+        p_j.font.size = Pt(8.5)
+        p_j.font.color.rgb = TEXT_MUTED
+
+    s5.notes_slide.notes_text_frame.text = (
+        "Slide 5 provides a unified comparative analysis of the Task Types used in both Question 1 and Question 2. "
+        "In BPMN 2.0, task typing dictates runtime execution semantics. "
+        "Notice the alignment: across both projects, User Tasks model human cognition—such as committee reviews in Question 1 and underwriting "
+        "in Question 2. Service Tasks handle automated microservices—like plagiarism checks in Question 1 and KYC APIs in Question 2. "
+        "Both systems utilize Send Tasks and Intermediate Message Catch Events for asynchronous communication. "
+        "Furthermore, Question 1 introduces a Business Rule Task to evaluate faculty workload caps against student project domains using a DMN decision table, "
+        "and a Script Task to clean up allocation locks if a student withdraws. Every task type is technically justified."
+    )
+
+    # ==========================================================
+    # SLIDE 6: Gateways & Concurrency Control
+    # ==========================================================
+    s6 = prs.slides.add_slide(blank_layout)
+    apply_slide_background(s6)
+    add_header(s6, "Gateways & Concurrency Control (Q1 vs. Q2)", "CONTROL FLOW")
+
+    # 3 Cards: Exclusive Gateway, Parallel Gateway, Event-Based Gateway
+    gw_cards = [
+        ("EXCLUSIVE GATEWAY (XOR ✕)", "Decision Routing (Both Q1 & Q2)",
+         "Evaluates condition expressions and activates EXACTLY ONE outgoing branch. On merge, passes any arriving token immediately.",
+         "• Q1: 'Proposal Valid?' (Valid vs Incomplete)\n• Q1: 'Committee Decision' (Approve / Revise / Reject)\n• Q1: 'Guide Available?' (Found vs Manual Allocation)\n• Q2: 'KYC Passed?' (Pass vs Manual Review vs Terminate)\n• Q2: 'Eligibility Decision' (Auto-Approve / Underwriter / Reject)\n• Q2: 'Underwriter Decision' (Approve / Collateral / Reject)\n• Q2: 'Offer Decision' (Accept / Counter / Withdraw)",
+         "Loan decisions and proposal verdicts are mutually exclusive; an application cannot be simultaneously approved and rejected. XOR ensures deterministic execution.",
+         CYAN_ACCENT),
+        ("PARALLEL GATEWAY (AND ✛)", "Concurrency Synchronization (Q2)",
+         "Forks one incoming path into multiple concurrent branches without conditions. The join waits for ALL incoming paths before proceeding.",
+         "• Q2 Fork: 'Start Parallel Verification Checks'\n  - Branch 1: KYC Identity & AML Screening\n  - Branch 2: Credit Bureau Score Retrieval\n  - Branch 3: Debt-to-Income (DTI) Calculation\n• Q2 Join: 'All Parallel Checks Complete'\n  - Synchronizes all 3 branches before income verification.",
+         "Running checks serially creates additive cycle time. Parallel execution cuts processing latency while the synchronized join prevents token race conditions.",
+         GREEN_ACCENT),
+        ("EVENT-BASED GATEWAY (⬡)", "Competing Event Selection (Q1)",
+         "Routes based on whichever external event occurs first, rather than evaluated data expressions.",
+         "• Q1: 'Wait for Guide Acceptance or Timeout'\n  - Branch A: Intermediate Message Catch ('Guide Accepts Request')\n  - Branch B: Intermediate Timer Event ('3-Day Guide Response Timeout')\n  - Result: If guide accepts, proceeds to record allocation; if 3 days elapse, diverts to Coordinator Manual Allocation.",
+         "Models real-world asynchronous competition: the process cannot know in advance whether the faculty member will accept or ignore the request.",
+         AMBER_ACCENT)
+    ]
+
+    card_w3 = Inches(3.77)
+    card_gap3 = Inches(0.2)
+    for i, (name, sub, defn, ex, just, acc) in enumerate(gw_cards):
+        c_left = Inches(0.8) + i * (card_w3 + card_gap3)
+        c = add_card(s6, c_left, Inches(1.5), card_w3, Inches(5.4), BG_CARD, BORDER_CARD)
+        tf = c.text_frame
+        tf.word_wrap = True
+
+        p0 = tf.paragraphs[0]
+        p0.text = name
+        p0.font.size = Pt(11.5)
+        p0.font.bold = True
+        p0.font.color.rgb = acc
+        p0.space_after = Pt(2)
+
+        p_s = tf.add_paragraph()
+        p_s.text = sub
+        p_s.font.size = Pt(9.5)
+        p_s.font.bold = True
+        p_s.font.color.rgb = TEXT_MUTED
+        p_s.space_after = Pt(6)
+
+        p_d = tf.add_paragraph()
+        p_d.text = f"Semantics: {defn}"
+        p_d.font.size = Pt(9)
+        p_d.font.color.rgb = TEXT_WHITE
+        p_d.space_after = Pt(8)
+
+        p_e = tf.add_paragraph()
+        p_e.text = ex
+        p_e.font.size = Pt(8.5)
+        p_e.font.color.rgb = TEXT_MUTED
+        p_e.space_after = Pt(8)
+
+        p_j = tf.add_paragraph()
+        p_j.text = f"Why Used? {just}"
+        p_j.font.size = Pt(8.5)
+        p_j.font.color.rgb = TEXT_WHITE
+
+    s6.notes_slide.notes_text_frame.text = (
+        "Slide 6 covers Gateway design across both projects. "
+        "Notice the distinct gateway roles: "
+        "Exclusive Gateways (XOR) are used in both Question 1 and Question 2 for binary and multi-way business decisions. "
+        "Parallel Gateways (AND) are prominently featured in Question 2 for deterministic concurrency: forking verification into KYC, "
+        "Credit Bureau, and DTI streams, and synchronizing them before underwriting. "
+        "Question 1 features an Event-Based Gateway where execution waits for competing events: either the faculty guide accepts the allocation message, "
+        "or a 3-day timer expires, triggering manual coordinator intervention. "
+        "We also explicitly justify why Inclusive Gateways (OR) were avoided: in both domains, decision branches are mutually exclusive, "
+        "and concurrency is strictly deterministic."
+    )
+
+    # ==========================================================
+    # SLIDE 7: Intermediate & Boundary Events Deep-Dive
+    # ==========================================================
+    s7 = prs.slides.add_slide(blank_layout)
+    apply_slide_background(s7)
+    add_header(s7, "Intermediate & Boundary Events Deep-Dive", "EVENT ARCHITECTURE")
+
+    c_banner = add_card(s7, Inches(0.8), Inches(1.5), Inches(11.7), Inches(0.85), BG_CARD, BORDER_CARD)
+    tf_b = c_banner.text_frame
+    tf_b.word_wrap = True
+    p = tf_b.paragraphs[0]
+    p.text = "CRITICAL DISTINCTION: INLINE INTERMEDIATE EVENTS VS. TASK BOUNDARY EVENTS"
+    p.font.size = Pt(10.5)
+    p.font.bold = True
+    p.font.color.rgb = CYAN_ACCENT
+    p_b_body = tf_b.add_paragraph()
+    p_b_body.text = "• Inline Intermediate Events sit in the sequence flow and pause token progress until an external trigger arrives.\n• Boundary Events attach to task perimeters; they monitor active execution and catch external timeouts, faults, or cancellations."
+    p_b_body.font.size = Pt(9.5)
+    p_b_body.font.color.rgb = TEXT_WHITE
+
+    event_grid = [
+        ("INLINE MESSAGE CATCH", "✉️ (Catch)", "Sequence Flow Intermediate Event",
+         "Q1: 'Receive Revision Request'\nStudent waits for committee feedback.\nQ1: 'Receive Guide Acceptance'\nSystem waits for guide response.\nQ2: 'Receive Credit Report'\nCore Banking waits for Credit Bureau report.",
+         "Models non-polling asynchronous waiting. Decouples collaborating parties.",
+         CYAN_ACCENT),
+        ("NON-INTERRUPTING TIMER", "⏱️ (Dashed Ring)", "Boundary Event on Task",
+         "Q1: '10-Day Review SLA Timer'\nFires HoD escalation reminder on committee.\nQ2: '24-Hour Credit Bureau Timer'\nFires automated retry request.\nQ2: '48-Hour E-Sign SLA Timer'\nTriggers wet-signature alert to operations.",
+         "Fires parallel escalations without aborting or cancelling the primary active user task.",
+         BLUE_ACCENT),
+        ("INTERRUPTING TIMER", "⏱️ (Solid Ring)", "Boundary Event on Task",
+         "Q1: '14-Day Submission Deadline'\nCancels proposal prep → EndEvent: Lapsed.\nQ1: '7-Day Revision Deadline'\nLimits student revision window.\nQ2: '7-Day Offer Validity Timer'\nCancels offer review → EndEvent: Offer Expired.",
+         "Enforces hard deadlines. Instantly cancels the underlying task and diverts flow to expiry end.",
+         AMBER_ACCENT),
+        ("INTERRUPTING ERROR BOUNDARY", "⚡ (Solid Ring)", "Boundary Event on Task",
+         "Q1: 'Notification Delivery Failure'\nCatches portal/SMS outage → IT recovery.\nQ2: 'Core Banking Disbursement Fault'\nCatches NEFT/RTGS transaction failure on Disburse Funds task → Operations retry.",
+         "Traps technical and transaction exceptions, preventing untracked financial or system states.",
+         RED_ACCENT)
+    ]
+
+    for i, (name, sym, ev_type, ex, just, acc) in enumerate(event_grid):
+        c_left = Inches(0.8) + i * (cw + cg)
+        c = add_card(s7, c_left, Inches(2.5), cw, Inches(4.4), BG_CARD, BORDER_CARD)
         tf = c.text_frame
         tf.word_wrap = True
 
@@ -595,168 +562,183 @@ def create_presentation():
         p0.font.size = Pt(11)
         p0.font.bold = True
         p0.font.color.rgb = acc
-        p0.space_after = Pt(4)
+        p0.space_after = Pt(2)
 
-        p_sym = tf.add_paragraph()
-        p_sym.text = f"Symbol: {sym}"
-        p_sym.font.size = Pt(9.5)
-        p_sym.font.bold = True
-        p_sym.font.color.rgb = TEXT_MUTED
+        p_s = tf.add_paragraph()
+        p_s.text = f"Symbol: {sym}"
+        p_s.font.size = Pt(9)
+        p_s.font.bold = True
+        p_s.font.color.rgb = TEXT_MUTED
 
-        p_type = tf.add_paragraph()
-        p_type.text = f"Category: {ev_type}"
-        p_type.font.size = Pt(9.5)
-        p_type.font.color.rgb = TEXT_WHITE
-        p_type.space_after = Pt(8)
+        p_t = tf.add_paragraph()
+        p_t.text = f"Type: {ev_type}"
+        p_t.font.size = Pt(9)
+        p_t.font.color.rgb = TEXT_WHITE
+        p_t.space_after = Pt(6)
 
-        p_body = tf.add_paragraph()
-        p_body.text = body
-        p_body.font.size = Pt(9.5)
-        p_body.font.color.rgb = TEXT_MUTED
+        p_e = tf.add_paragraph()
+        p_e.text = ex
+        p_e.font.size = Pt(8.5)
+        p_e.font.color.rgb = TEXT_MUTED
+        p_e.space_after = Pt(6)
 
-    s6.notes_slide.notes_text_frame.text = (
-        "Slide 6 provides our deep-dive into Intermediate and Boundary Events, which is a mandatory topic in the evaluation rubric. "
-        "It is crucial to avoid mislabeling boundary events as inline flow events. "
-        "We clearly demonstrate the architectural difference: inline events sit directly in the sequence flow, while boundary events attach to task perimeters. "
-        "Our model employs four distinct event configurations: "
-        "1. Intermediate Message Catch: sits inline in the Core Banking lane, waiting for the external credit report. "
-        "2. Non-interrupting Timer Boundary Events: with dashed double borders, these fire parallel escalations—like a 24-hour credit retry or a 48-hour "
-        "e-signature reminder—without aborting the underlying user task. "
-        "3. Interrupting Timer Boundary Event: with solid double borders on the 7-day offer review, which terminates the task and transitions directly to Offer Expired. "
-        "4. Interrupting Error Boundary Event: attached to the automated disbursement service task to catch banking transfer exceptions and route them to Operations."
+        p_j = tf.add_paragraph()
+        p_j.text = f"Why Needed? {just}"
+        p_j.font.size = Pt(8.5)
+        p_j.font.color.rgb = TEXT_WHITE
+
+    s7.notes_slide.notes_text_frame.text = (
+        "Slide 7 provides a detailed breakdown of Intermediate and Boundary Events across both Question 1 and Question 2. "
+        "We clearly demonstrate the architectural distinction between inline events and boundary events. "
+        "Both systems make extensive use of all four major event patterns: "
+        "1. Inline Message Catch Events for asynchronous inter-process coordination; "
+        "2. Non-interrupting Boundary Timers with dashed double rings for non-blocking SLA reminders in both student review and loan credit retries; "
+        "3. Interrupting Boundary Timers with solid double rings for hard deadline enforcement, such as the 14-day proposal submission window "
+        "in Question 1 and the 7-day offer validity period in Question 2; and "
+        "4. Interrupting Error Boundary Events to catch system crashes and core banking transaction faults."
     )
 
     # ==========================================================
-    # SLIDE 7: Happy Path / Critical Path
+    # SLIDE 8: Happy Path & Business-Critical Flow (Comparative)
     # ==========================================================
-    s7 = prs.slides.add_slide(blank_layout)
-    apply_slide_background(s7)
-    add_header(s7, "The Happy Path & Business-Critical Flow", "EXECUTION LIFECYCLE")
+    s8 = prs.slides.add_slide(blank_layout)
+    apply_slide_background(s8)
+    add_header(s8, "Happy Path & Business-Critical Flows (Q1 vs. Q2)", "EXECUTION LIFECYCLE")
 
-    # Step-by-Step Happy Path Flow (Left 7.8 in)
-    c_happy = add_card(s7, Inches(0.8), Inches(1.5), Inches(7.8), Inches(5.4), BG_CARD, BORDER_CARD)
-    tf_h = c_happy.text_frame
-    tf_h.word_wrap = True
+    # Left: Q1 Happy Path
+    c_hp1 = add_card(s8, Inches(0.8), Inches(1.5), Inches(5.7), Inches(5.4), BG_CARD, BORDER_CARD)
+    tf_h1 = c_hp1.text_frame
+    tf_h1.word_wrap = True
 
-    p = tf_h.paragraphs[0]
-    p.text = "THE 15-STEP SEQUENTIAL HAPPY PATH"
-    p.font.size = Pt(12)
+    p = tf_h1.paragraphs[0]
+    p.text = "QUESTION 1 HAPPY PATH (ACADEMIC ALLOCATION)"
+    p.font.size = Pt(11)
     p.font.bold = True
-    p.font.color.rgb = GREEN_ACCENT
-    p.space_after = Pt(8)
+    p.font.color.rgb = CYAN_ACCENT
+    p.space_after = Pt(6)
 
-    steps = [
-        "1. Start Event: Applicant prepares and submits online loan application and KYC/income documents.",
-        "2. Service Task: System validates document schema completeness (ID, pay slips, statements present).",
-        "3. Parallel Split: Concurrently triggers KYC/AML screening, Credit Bureau request, and DTI computation.",
-        "4. Fraud & Compliance: KYC identity matches government database; AML screening returns zero watchlist hits.",
-        "5. External Credit Bureau: Returns credit score above threshold (Score ≥ 750) via Message Flow.",
-        "6. Core Banking: Calculates DTI ratio within policy limit (DTI < 40%).",
-        "7. Parallel Join: Synchronizes all three successful background streams.",
-        "8. User Task: Loan Officer verifies submitted salary slips and employer standing.",
-        "9. Service Task: Scoring engine calculates composite risk score → qualifies for Auto-Approval.",
-        "10. User Task: Loan Officer generates standard loan offer letter with approved interest rate.",
-        "11. Send Task: System dispatches formal offer letter to applicant portal & registered email.",
-        "12. User Task: Applicant reviews terms and selects 'Accept Offer' within 7-day validity window.",
-        "13. User Task: Applicant digitally e-signs loan agreement via integrated platform.",
-        "14. User Task: Operations team verifies disbursement instructions and linked bank account.",
-        "15. Service Task & End: Core Banking executes NEFT/RTGS transfer, creates loan account → Loan Disbursed!"
+    q1_flow = [
+        "1. Start Event: Student prepares and submits proposal form.",
+        "2. Service Task: System validates document completeness.",
+        "3. Service Task: System verifies team composition rules.",
+        "4. User Task: Coordinator screens proposal for eligibility.",
+        "5. Service Task: System executes similarity / duplicate check.",
+        "6. User Task: Review Committee evaluates and APPROVES proposal.",
+        "7. Business Rule Task: DMN checks guide workload and domain.",
+        "8. Service Task: System executes automated guide allocation.",
+        "9. Send Task: System dispatches allocation request to guide.",
+        "10. Event Catch: Guide accepts request within 3-day SLA.",
+        "11. Service Task: System formally records allocation in DB.",
+        "12. Send Task: System dispatches confirmation to student team.",
+        "13. User Task: Student acknowledges guide assignment.",
+        "14. SUCCESS END: Project Allocated & Guide Confirmed."
     ]
-    for s in steps:
-        sp = tf_h.add_paragraph()
+    for s in q1_flow:
+        sp = tf_h1.add_paragraph()
         sp.space_after = Pt(2)
         sp.text = s
-        sp.font.size = Pt(9.5)
+        sp.font.size = Pt(8.5)
         sp.font.color.rgb = TEXT_WHITE
 
-    # Right: Terminology Clarification & Milestones (3.7 in)
-    c_cpm = add_card(s7, Inches(8.8), Inches(1.5), Inches(3.7), Inches(5.4), BG_CARD, BORDER_CARD)
-    tf_cpm = c_cpm.text_frame
-    tf_cpm.word_wrap = True
+    # Right: Q2 Happy Path & Academic CPM Note
+    c_hp2 = add_card(s8, Inches(6.8), Inches(1.5), Inches(5.7), Inches(5.4), BG_CARD, BORDER_CARD)
+    tf_h2 = c_hp2.text_frame
+    tf_h2.word_wrap = True
 
-    p = tf_cpm.paragraphs[0]
-    p.text = "CRITICAL BPMN TERMINOLOGY CLARIFICATION"
+    p = tf_h2.paragraphs[0]
+    p.text = "QUESTION 2 HAPPY PATH & TERMINOLOGY DEFENCE"
+    p.font.size = Pt(11)
+    p.font.bold = True
+    p.font.color.rgb = GREEN_ACCENT
+    p.space_after = Pt(6)
+
+    q2_flow = [
+        "1. Start Event: Applicant submits loan application & documents.",
+        "2. Service Task: Completeness check validates document schema.",
+        "3. Parallel Split: Triggers KYC/AML, Credit Bureau & DTI checks.",
+        "4. Parallel Join: Synchronizes all 3 successful background checks.",
+        "5. User Task: Loan Officer verifies income & employment.",
+        "6. Service Task: Scoring engine calculates Auto-Approval score.",
+        "7. Send Task: Officer generates & dispatches loan offer letter.",
+        "8. User Task: Applicant reviews & ACCEPTS offer within 7 days.",
+        "9. User Task: Applicant e-signs digital loan agreement.",
+        "10. Service Task & End: Core Banking disburses funds via NEFT/RTGS.",
+        "--- ACADEMIC CLARIFICATION ON CRITICAL PATH ---",
+        "• Happy Path = Ideal sequence with zero rework or failures.",
+        "• Critical Path Method (CPM) = Longest duration path with zero slack in operations research. It requires empirical task durations (PERT distributions).",
+        "• Academic Stance: We do NOT invent artificial task durations. We model the Happy Path as the 'Business-Critical Flow'."
+    ]
+    for s in q2_flow:
+        sp = tf_h2.add_paragraph()
+        sp.space_after = Pt(2)
+        sp.text = s
+        sp.font.size = Pt(8.5)
+        if "ACADEMIC" in s:
+            sp.font.bold = True
+            sp.font.color.rgb = AMBER_ACCENT
+        elif "Happy Path =" in s or "Critical Path Method" in s or "Academic Stance" in s:
+            sp.font.color.rgb = TEXT_MUTED
+        else:
+            sp.font.color.rgb = TEXT_WHITE
+
+    s8.notes_slide.notes_text_frame.text = (
+        "Slide 8 compares the Happy Paths of both processes. "
+        "The happy path represents the ideal, uninterrupted execution trajectory where all validations pass and value is successfully delivered. "
+        "In Question 1, it traces the proposal through automated screening, committee approval, DMN guide matching, and guide acceptance. "
+        "In Question 2, it traces the loan application through parallel background checks, income verification, auto-approval, offer acceptance, "
+        "and automated NEFT disbursement. "
+        "We also reinforce our critical terminology defence: in academic examinations, students often conflate the Happy Path with the Critical Path Method (CPM). "
+        "We explain clearly that CPM is a mathematical scheduling technique requiring statistical task duration distributions. "
+        "Because our project focuses on behavioral choreography, we define the happy path as the Business-Critical Flow rather than guessing durations."
+    )
+
+    # ==========================================================
+    # SLIDE 9: Critical Failure Points: Question 1 (Student Project)
+    # ==========================================================
+    s9 = prs.slides.add_slide(blank_layout)
+    apply_slide_background(s9)
+    add_header(s9, "Failure Path Matrix: Question 1 (Student Project)", "FAILURE REGISTER — Q1")
+
+    c_f1 = add_card(s9, Inches(0.8), Inches(1.5), Inches(11.7), Inches(5.4), BG_CARD, BORDER_CARD)
+    tf_f1 = c_f1.text_frame
+    tf_f1.word_wrap = True
+
+    p = tf_f1.paragraphs[0]
+    p.text = "QUESTION 1 FAILURE PATH REGISTER (F1 – F6 HIGHLIGHTS)"
     p.font.size = Pt(11)
     p.font.bold = True
     p.font.color.rgb = CYAN_ACCENT
     p.space_after = Pt(8)
 
-    cpm_points = [
-        ("Happy Path vs Critical Path: ", "In academic workflow modelling, the 'Happy Path' describes the optimal successful business execution with zero rework or failures. It should NOT be confused with the mathematically calculated Critical Path Method (CPM)."),
-        ("Why CPM is Not Inferred: ", "CPM requires deterministic task duration distributions (earliest/latest start and slack). BPMN defines behavioral control-flow semantics. Inventing arbitrary durations without empirical log data is academically unsound."),
-        ("Business-Critical Milestones: ", "1. Automated Verification Gate (all 3 parallel checks pass).\n2. Eligibility Adjudication (risk tier established).\n3. Customer Commitment (offer acceptance & e-signature).\n4. Fund Disbursement & Account Creation."),
-    ]
-    for t, desc in cpm_points:
-        p_row = tf_cpm.add_paragraph()
-        p_row.space_after = Pt(8)
-        r1 = p_row.add_run()
-        r1.text = t
-        r1.font.bold = True
-        r1.font.size = Pt(10)
-        r1.font.color.rgb = TEXT_WHITE
-        r2 = p_row.add_run()
-        r2.text = desc
-        r2.font.size = Pt(9.5)
-        r2.font.color.rgb = TEXT_MUTED
-
-    s7.notes_slide.notes_text_frame.text = (
-        "On Slide 7, we trace the complete Happy Path of our system. The happy path represents the uninterrupted ideal flow: "
-        "an eligible customer submits documents, passes automated KYC, AML, credit score, and DTI ratio checks concurrently, "
-        "qualifies for auto-approval, accepts the generated offer, e-signs the agreement, and receives disbursement into their account. "
-        "I want to draw your attention to an important academic distinction highlighted on the right: "
-        "We explicitly distinguish the 'Happy Path' from the 'Critical Path'. In project management, the Critical Path Method relies on mathematical "
-        "durations and zero float time. Because this assignment focuses on business process choreography rather than statistical queue simulations, "
-        "we do not invent artificial task durations. Instead, we define the Happy Path as the business-critical sequence required to achieve value."
-    )
-
-    # ==========================================================
-    # SLIDE 8: Critical Failure Points
-    # ==========================================================
-    s8 = prs.slides.add_slide(blank_layout)
-    apply_slide_background(s8)
-    add_header(s8, "Critical Failure Points Matrix (L1 – L6)", "EXCEPTION REGISTER")
-
-    # Table of 6 Critical Failures: Trigger -> Detection -> Recovery -> Outcome
-    c_tbl = add_card(s8, Inches(0.8), Inches(1.5), Inches(11.7), Inches(5.4), BG_CARD, BORDER_CARD)
-    tf_t = c_tbl.text_frame
-    tf_t.word_wrap = True
-
-    p = tf_t.paragraphs[0]
-    p.text = "MANDATORY FAILURE PATH REGISTER — AUTOMATED VERIFICATION PHASE"
-    p.font.size = Pt(11)
-    p.font.bold = True
-    p.font.color.rgb = RED_ACCENT
-    p.space_after = Pt(8)
-
-    failures_l1_l6 = [
-        ("L1", "Document Incompleteness", "Missing Aadhaar/PAN, illegible bank statements, wrong PDF format.",
-         "Service Task validation schema fails → Exclusive Gateway routes to 'Return Application'.",
-         "Loan Officer issues correction notice; Applicant resubmits via loop. Timer limits lapse window.",
-         "Correction Loop OR 'EndEvent: Application Lapsed'"),
-        ("L2", "KYC Identity Mismatch", "Name misspelling, date of birth mismatch, expired ID document.",
-         "KYC Service Task returns API error code → Exclusive Gateway branches to exception.",
-         "Compliance Officer reviews document manually. If verified, rejoins AML flow; else terminates.",
-         "Manual Clearance OR 'EndEvent: Fraud Terminated'"),
-        ("L3", "AML / Watchlist Flag", "Applicant name matches sanctioned individuals, PEP lists, or fraud DB.",
-         "AML Service Task flags risk score ≥ threshold → Exclusive Gateway branches to probe.",
-         "Compliance Officer conducts deep manual investigation. Zero tolerance for sanctioned entities.",
-         "Terminal 'EndEvent: Application Terminated – Fraud/AML'"),
-        ("L4", "Credit Bureau Timeout", "Credit bureau service unresponsive, network partition, timeout > 24h.",
-         "Non-interrupting Timer Boundary Event (24h) fires on outbound request task.",
-         "Core Banking retries request asynchronously up to threshold, preserving customer session.",
-         "Resilient Catch on retry OR manual credit assessment fallback"),
-        ("L5", "Credit Score Rejection", "Report returns credit bureau score below minimum underwriting floor (< 600).",
-         "Credit Bureau gateway evaluates score; feeds failed attribute into parallel join.",
-         "Eligibility calculation incorporates sub-prime score; triggers auto-rejection decision.",
-         "Terminal 'EndEvent: Loan Rejected – Low Credit Score'"),
-        ("L6", "Excessive DTI Ratio", "Applicant liabilities result in debt-to-income ratio exceeding 50% limit.",
-         "Automated DTI Service Task computes ratio > threshold → Exclusive Gateway routes to reject.",
-         "Application marked financially unviable. Immediate rejection dispatched to applicant.",
-         "Terminal 'EndEvent: Loan Rejected – Excessive DTI'"),
+    q1_failures = [
+        ("F1", "Document Incompleteness", "Missing sections, absent signatures, wrong document format.",
+         "Service Task validation schema fails → Exclusive Gateway routes to Coordinator.",
+         "Coordinator returns proposal with deficiency checklist for student correction.",
+         "Correction Loop OR 'EndEvent: Invalid Proposal Returned'"),
+        ("F2", "Team Rule Violation", "Team size below minimum, ineligible member, mixed-department rules.",
+         "Service Task validates rules → Exclusive Gateway branches to invalidation.",
+         "Proposal marked non-compliant. Student team must reform before resubmission.",
+         "Terminal 'EndEvent: Invalid Proposal Returned'"),
+        ("F3", "Duplicate / Plagiarised Topic", "Similarity engine detects ≥ 70% overlap with existing or past projects.",
+         "Service Task similarity API flags score → Exclusive Gateway routes to rejection.",
+         "Coordinator logs duplicate topic; student team must propose an entirely new topic.",
+         "Terminal 'EndEvent: Duplicate / Plagiarised Topic'"),
+        ("F4", "Proposal Submission Lapsed", "Student team fails to submit proposal within the 14-day departmental window.",
+         "Interrupting Timer Boundary Event (14 days) fires on submission task.",
+         "System automatically closes proposal draft; flags student team for late penalty.",
+         "Terminal 'EndEvent: Proposal Lapsed'"),
+        ("F5", "Committee Revision Request", "Committee finds proposal technically weak or overly broad, but salvageable.",
+         "Exclusive Gateway on committee decision selects 'Requires Revision' branch.",
+         "Send Task transmits feedback; student resubmits via loop (capped at 2 cycles).",
+         "Revision Loop back to Similarity Check OR Withdrawal"),
+        ("F6", "Committee Rejection", "Proposal judged academically infeasible, out of scope, or non-viable.",
+         "Exclusive Gateway on committee decision selects 'Rejected' branch.",
+         "Formal rejection notification dispatched; record archived.",
+         "Terminal 'EndEvent: Proposal Rejected'"),
     ]
 
-    for fid, name, cause, detect, recovery, outcome in failures_l1_l6:
-        p_row = tf_t.add_paragraph()
+    for fid, name, cause, detect, recovery, outcome in q1_failures:
+        p_row = tf_f1.add_paragraph()
         p_row.space_after = Pt(5)
         r0 = p_row.add_run()
         r0.text = f"[{fid}] {name}: "
@@ -780,44 +762,120 @@ def create_presentation():
         r3.font.size = Pt(9.5)
         r3.font.color.rgb = AMBER_ACCENT
 
-    s8.notes_slide.notes_text_frame.text = (
-        "Slide 8 presents the first half of our Failure Path Register, covering failures L1 through L6. "
-        "A key requirement of this project was to avoid simplifying the workflow into only the happy path. "
-        "We followed the structured pattern requested: Failure Trigger → Detection Element → Recovery Action → Resulting Outcome. "
-        "Notice how our model handles each failure gracefully: "
-        "For L1, missing documents do not instantly kill the application; instead, a correction loop allows the student or customer to resubmit, "
-        "governed by a lapse timer. "
-        "For L2, automated KYC failures trigger a human compliance fallback rather than an immediate false-positive rejection. "
-        "For L3, AML watchlist matches trigger an unrecoverable Terminate End Event. "
-        "For L4, credit bureau outages are handled via non-interrupting timer retries, preventing system deadlocks."
+    s9.notes_slide.notes_text_frame.text = (
+        "Slide 9 outlines the Failure Path Register for Question 1, following the required visual format: "
+        "Failure Trigger → Detection Element → Recovery Action → Resulting Outcome. "
+        "Notice the realistic handling: incomplete proposals in F1 allow correction, while fundamental team rule violations in F2 terminate immediately. "
+        "Plagiarism in F3 is caught by automated Service Tasks. "
+        "Unresponsive students in F4 are timed out via an interrupting 14-day boundary event. "
+        "In F5, committee revisions trigger a formal feedback loop, while outright rejections in F6 terminate gracefully to an auditable end event."
     )
 
     # ==========================================================
-    # SLIDE 9: Alternate and Exception Paths
+    # SLIDE 10: Critical Failure Points: Question 2 (Loan Origination)
     # ==========================================================
-    s9 = prs.slides.add_slide(blank_layout)
-    apply_slide_background(s9)
-    add_header(s9, "Alternate & Exception Paths (L7 – L12)", "BRANCHING LOGIC")
+    s10 = prs.slides.add_slide(blank_layout)
+    apply_slide_background(s10)
+    add_header(s10, "Failure Path Matrix: Question 2 (Loan Origination)", "FAILURE REGISTER — Q2")
 
-    # Left: Underwriter & Collateral Re-valuation Loop (L7 & L8) (5.7 in)
-    c_uw = add_card(s9, Inches(0.8), Inches(1.5), Inches(5.7), Inches(5.4), BG_CARD, BORDER_CARD)
-    tf_uw = c_uw.text_frame
-    tf_uw.word_wrap = True
+    c_f2 = add_card(s10, Inches(0.8), Inches(1.5), Inches(11.7), Inches(5.4), BG_CARD, BORDER_CARD)
+    tf_f2 = c_f2.text_frame
+    tf_f2.word_wrap = True
 
-    p = tf_uw.paragraphs[0]
-    p.text = "UNDERWRITER ADJUDICATION & COLLATERAL LOOP (L7 & L8)"
+    p = tf_f2.paragraphs[0]
+    p.text = "QUESTION 2 FAILURE PATH REGISTER (L1 – L6 HIGHLIGHTS)"
+    p.font.size = Pt(11)
+    p.font.bold = True
+    p.font.color.rgb = GREEN_ACCENT
+    p.space_after = Pt(8)
+
+    q2_failures = [
+        ("L1", "Document Completeness", "Missing income proof, illegible PAN/Aadhaar scans, invalid file format.",
+         "Service Task completeness validation schema fails → Exclusive Gateway routes.",
+         "Loan Officer issues deficiency notice; applicant resubmits via bounded loop.",
+         "Correction Loop OR 'EndEvent: Application Lapsed'"),
+        ("L2", "KYC Identity Mismatch", "Name misspelling, date of birth mismatch against government database.",
+         "KYC Service Task returns API error code → Exclusive Gateway branches.",
+         "Compliance Officer reviews document manually. If unresolvable, terminates.",
+         "Manual Clearance OR 'EndEvent: Fraud Terminated'"),
+        ("L3", "AML Watchlist Flag", "Applicant matches PEP lists, sanction registries, or financial crime DB.",
+         "AML Service Task flags risk score ≥ threshold → Exclusive Gateway routes to probe.",
+         "Compliance Officer conducts deep investigation; zero tolerance for sanctioned entities.",
+         "Terminal 'EndEvent: Application Terminated – Fraud/AML'"),
+        ("L4", "Credit Bureau Timeout", "Credit bureau service unresponsive, network partition, timeout > 24 hours.",
+         "Non-interrupting Timer Boundary Event (24h) fires on outbound request task.",
+         "Core Banking retries request asynchronously up to threshold without killing session.",
+         "Resilient Catch on retry OR manual credit assessment fallback"),
+        ("L5", "Credit Score Rejection", "Report returns credit bureau score below minimum underwriting floor (< 600).",
+         "Credit Bureau gateway evaluates score; feeds failed attribute into parallel join.",
+         "Eligibility calculation incorporates sub-prime score; triggers auto-rejection.",
+         "Terminal 'EndEvent: Loan Rejected – Low Credit Score'"),
+        ("L6", "Excessive DTI Ratio", "Applicant liabilities result in debt-to-income ratio exceeding 50% limit.",
+         "Automated DTI Service Task computes ratio > threshold → Exclusive Gateway routes.",
+         "Application marked financially unviable. Immediate rejection dispatched.",
+         "Terminal 'EndEvent: Loan Rejected – Excessive DTI'"),
+    ]
+
+    for fid, name, cause, detect, recovery, outcome in q2_failures:
+        p_row = tf_f2.add_paragraph()
+        p_row.space_after = Pt(5)
+        r0 = p_row.add_run()
+        r0.text = f"[{fid}] {name}: "
+        r0.font.bold = True
+        r0.font.size = Pt(10)
+        r0.font.color.rgb = GREEN_ACCENT
+
+        r1 = p_row.add_run()
+        r1.text = f"Trigger: {cause} | "
+        r1.font.size = Pt(9.5)
+        r1.font.color.rgb = TEXT_MUTED
+
+        r2 = p_row.add_run()
+        r2.text = f"Detection: {detect} | "
+        r2.font.size = Pt(9.5)
+        r2.font.color.rgb = TEXT_WHITE
+
+        r3 = p_row.add_run()
+        r3.text = f"Outcome: {outcome}"
+        r3.font.bold = True
+        r3.font.size = Pt(9.5)
+        r3.font.color.rgb = AMBER_ACCENT
+
+    s10.notes_slide.notes_text_frame.text = (
+        "Slide 10 details the Failure Path Register for Question 2, covering failures L1 through L6. "
+        "Notice how our financial exception handling mirrors real-world commercial banking: "
+        "Missing documents in L1 trigger a correction loop with a lapse timer. "
+        "In L2, automated KYC failures trigger a human compliance fallback to prevent false positives. "
+        "In L3, AML watchlist matches trigger an unrecoverable Terminate End Event. "
+        "In L4, credit bureau outages are handled via non-interrupting timer retries, preventing system deadlocks. "
+        "In L5 and L6, credit score and DTI failures route cleanly through the scoring gateway into auditable rejection end events."
+    )
+
+    # ==========================================================
+    # SLIDE 11: Alternate Paths & Complex Exception Loops
+    # ==========================================================
+    s11 = prs.slides.add_slide(blank_layout)
+    apply_slide_background(s11)
+    add_header(s11, "Alternate Paths & Exception Loops (Q1 & Q2)", "BRANCHING LOGIC")
+
+    # Left: Q1 Loops
+    c_lp1 = add_card(s11, Inches(0.8), Inches(1.5), Inches(5.7), Inches(5.4), BG_CARD, BORDER_CARD)
+    tf_lp1 = c_lp1.text_frame
+    tf_lp1.word_wrap = True
+
+    p = tf_lp1.paragraphs[0]
+    p.text = "QUESTION 1: ACADEMIC EXCEPTION LOOPS"
     p.font.size = Pt(11)
     p.font.bold = True
     p.font.color.rgb = CYAN_ACCENT
     p.space_after = Pt(8)
 
-    uw_steps = [
-        ("Borderline Risk Scoring (L7): ", "When eligibility scoring falls into the 600–749 range or loan amount exceeds policy caps, the Exclusive Gateway diverts the application away from auto-approval to 'Underwriter Full Manual Review'."),
-        ("Underwriter Three-Way Branch: ", "The underwriter has three mutually exclusive outcomes:\n• Approve: overrides risk tier, proceeds to offer generation.\n• Require Collateral: triggers secured asset evaluation (L8).\n• Reject: terminates flow to 'EndEvent: Loan Rejected'."),
-        ("Collateral Valuation & Re-underwrite Loop (L8): ", "If collateral is required, a User Task requests an appraiser valuation. An Exclusive Gateway checks if Loan-to-Value (LTV) meets policy. If insufficient, 'Re-Underwrite' loops back to Underwriter Review with revised terms, avoiding premature rejection."),
+    q1_loops = [
+        ("Committee Revision Loop (F5): ", "When the committee demands revisions, an Exclusive Gateway routes to 'Send Revision Feedback'. The student receives the feedback via an Intermediate Message Catch Event, revises the proposal, and resubmits. To prevent infinite loops, the process enforces a maximum of 2 revision cycles before forcing an approve/reject decision."),
+        ("Guide Decline & Re-Allocation Loop (F8/F9): ", "When a faculty guide declines or the 3-day timer expires, the flow branches to Coordinator Manual Allocation. The coordinator can assign an alternate faculty member, appoint a co-guide, or place the team on a waitlist. If manual allocation succeeds, the flow rejoins confirmation; otherwise it ends at 'No Guide Available'."),
     ]
-    for t, desc in uw_steps:
-        p_row = tf_uw.add_paragraph()
+    for t, desc in q1_loops:
+        p_row = tf_lp1.add_paragraph()
         p_row.space_after = Pt(8)
         r1 = p_row.add_run()
         r1.text = t
@@ -829,26 +887,25 @@ def create_presentation():
         r2.font.size = Pt(9.5)
         r2.font.color.rgb = TEXT_MUTED
 
-    # Right: Offer Expiry, Withdrawal, E-Sign & Disbursement (L9 – L12) (5.7 in)
-    c_post = add_card(s9, Inches(6.8), Inches(1.5), Inches(5.7), Inches(5.4), BG_CARD, BORDER_CARD)
-    tf_post = c_post.text_frame
-    tf_post.word_wrap = True
+    # Right: Q2 Loops
+    c_lp2 = add_card(s11, Inches(6.8), Inches(1.5), Inches(5.7), Inches(5.4), BG_CARD, BORDER_CARD)
+    tf_lp2 = c_lp2.text_frame
+    tf_lp2.word_wrap = True
 
-    p = tf_post.paragraphs[0]
-    p.text = "OFFER EXPIRY, WITHDRAWAL & DISBURSEMENT FAULTS (L9 – L12)"
+    p = tf_lp2.paragraphs[0]
+    p.text = "QUESTION 2: BANKING EXCEPTION LOOPS"
     p.font.size = Pt(11)
     p.font.bold = True
-    p.font.color.rgb = AMBER_ACCENT
+    p.font.color.rgb = GREEN_ACCENT
     p.space_after = Pt(8)
 
-    post_steps = [
-        ("L9 Offer Acceptance Timeout: ", "An interrupting boundary timer on 'Review Loan Offer' fires after 7 days, immediately aborting the offer and routing to 'EndEvent: Loan Offer Expired'."),
-        ("L10 Applicant Withdrawal / Negotiation: ", "Applicants can select 'Counter-Offer' (initiating negotiation with Loan Officer) or 'Withdraw Application' (routing to data archival and 'EndEvent: Application Withdrawn')."),
-        ("L11 E-Signature Latency: ", "A non-interrupting boundary timer (48h) triggers an Operations alert for wet-signature preparation without cancelling digital signing capability."),
-        ("L12 Core Banking Disbursement Error: ", "An interrupting Error Boundary Event on 'Disburse Loan Funds' catches payment gateway / RTGS faults, preventing double-transfers and routing to Operations retry."),
+    q2_loops = [
+        ("Underwriting & Collateral Loop (L7/L8): ", "Borderline scores (600–749) divert from auto-approval to 'Underwriter Full Manual Review'. If unsecured credit is too risky, the underwriter requests collateral valuation. If the appraised Loan-to-Value (LTV) is insufficient, 'Re-Underwrite' loops back with adjusted loan amounts, preventing premature rejection."),
+        ("Applicant Counter-Offer Negotiation (L10): ", "Upon receiving the loan offer, the applicant can select 'Counter-Offer'. A Loan Officer manually reviews the requested rate/tenor adjustments. If accepted, negotiated terms are finalized; if rejected, the application concludes as rejected or withdrawn."),
+        ("Disbursement Fault Retry (L12): ", "An Interrupting Error Boundary Event catches RTGS/NEFT failures, routing to Operations for manual fallback retry without risking double debit."),
     ]
-    for t, desc in post_steps:
-        p_row = tf_post.add_paragraph()
+    for t, desc in q2_loops:
+        p_row = tf_lp2.add_paragraph()
         p_row.space_after = Pt(8)
         r1 = p_row.add_run()
         r1.text = t
@@ -860,43 +917,41 @@ def create_presentation():
         r2.font.size = Pt(9.5)
         r2.font.color.rgb = TEXT_MUTED
 
-    s9.notes_slide.notes_text_frame.text = (
-        "Slide 9 demonstrates how our model handles alternate and exception paths in the later stages of the lifecycle, specifically L7 through L12. "
-        "A standout architectural feature on the left is our Underwriting and Collateral loop: borderline applications are not discarded. "
-        "They are routed to an expert underwriter who can request collateral. If collateral appraisal reveals insufficient Loan-to-Value, "
-        "the re-underwriting task loops back to adjust the loan terms dynamically. "
-        "On the right, we showcase post-approval robustness: if a borrower ignores an offer, a 7-day interrupting timer expires the contract. "
-        "If they request a counter-offer, an alternate negotiation loop is activated. "
-        "Finally, for L12, should the core banking disbursement fail due to a network glitch or frozen account, an Error Boundary Event catches the technical "
-        "fault, completely preventing untracked financial transactions and enabling operational recovery."
+    s11.notes_slide.notes_text_frame.text = (
+        "Slide 11 examines the complex Alternate Paths and Exception Loops in both projects. "
+        "A process model without loops cannot represent reality. "
+        "In Question 1, we show two critical loops: the Committee Revision Loop, which allows students to revise proposals up to 2 cycles, "
+        "and the Guide Allocation Fallback Loop, where declining guides trigger manual coordinator reassignment. "
+        "In Question 2, we highlight the Underwriter and Collateral Valuation Loop, which enables secured re-underwriting rather than instant rejection, "
+        "and the Counter-Offer Negotiation Loop between applicant and loan officer. "
+        "Both systems illustrate how processes leave the happy path, resolve exceptions, and safely rejoin the main flow."
     )
 
     # ==========================================================
-    # SLIDE 10: Failure Handling and Recovery
+    # SLIDE 12: Process Robustness, Recovery Mechanisms & Governance
     # ==========================================================
-    s10 = prs.slides.add_slide(blank_layout)
-    apply_slide_background(s10)
-    add_header(s10, "Failure Handling, Robustness & Governance", "FAULT ARCHITECTURE")
+    s12 = prs.slides.add_slide(blank_layout)
+    apply_slide_background(s12)
+    add_header(s12, "Process Robustness, Recovery & Governance", "FAULT ARCHITECTURE")
 
-    # 4 Governance Pillar Cards
     pillars = [
         ("RETRY LIMITS & LOOP CONTROL", "🔁",
-         "Uncontrolled loops create infinite execution deadlocks. Our model enforces strict loop limits on document corrections (L1) and credit bureau retries (L4). Once retry thresholds are exhausted, the flow deterministically escalates or terminates to an explicit Lapsed End Event.",
+         "Uncontrolled loops create infinite execution deadlocks. Both models enforce strict loop counters: Question 1 limits committee revision cycles to 2 iterations and document resubmissions to 2 attempts. Question 2 bounds credit bureau retries and applicant document corrections with explicit lapse timers.",
          CYAN_ACCENT),
         ("SLA TIMERS & ESCALATION", "⏰",
-         "Strict temporal boundaries govern customer and operational responsiveness. Interrupting timers enforce commercial validity (7-day offer expiry), while non-interrupting timers trigger parallel administrative alerts (e-sign delays) without breaking customer self-service.",
+         "Deadlines prevent applications from stalling silently. We use Interrupting Timers for hard cut-offs (Q1 14-day submission deadline, Q2 7-day offer acceptance expiry) and Non-Interrupting Timers for administrative reminders (Q1 10-day committee review SLA escalation to HoD, Q2 48-hour e-sign alert).",
          GREEN_ACCENT),
         ("HUMAN-IN-THE-LOOP FALLBACK", "👥",
-         "Automated services can yield false negatives. When automated KYC API fails (L2), the model falls back to a Compliance Officer User Task. When e-signature platforms fail (L11), operations can execute physical wet-signatures, ensuring high conversion rates.",
+         "Automated services can yield false negatives. When automated DMN guide allocation in Q1 finds no available guide, it falls back to a Coordinator User Task. When automated KYC in Q2 fails, a Compliance Officer manually adjudicates the document, maintaining high conversion rates.",
          BLUE_ACCENT),
-        ("RECOVERY VS. COMPENSATION", "⚖️",
-         "In BPMN 2.0, 'Recovery' refers to forward error handling (retrying a task or taking an alternate branch). 'Compensation' (Undo / Compensate Event) cancels committed state. Our model utilizes forward recovery for disbursement retries and data archival on applicant withdrawal.",
+        ("FORWARD RECOVERY VS. TRANSACTIONAL COMPENSATION", "⚖️",
+         "In BPMN 2.0, Forward Recovery resolves active faults through retries and alternate branches (e.g., Q2 Core Banking disbursement error boundary). Backward Compensation cancels committed milestones. Q1 uses script compensation to release guide pre-allocations if a student withdraws.",
          PURPLE_ACCENT),
     ]
 
     for i, (p_title, icon, p_desc, acc_c) in enumerate(pillars):
         top_pos = Inches(1.5) + i * Inches(1.35)
-        c = add_card(s10, Inches(0.8), top_pos, Inches(11.7), Inches(1.2), BG_CARD, BORDER_CARD)
+        c = add_card(s12, Inches(0.8), top_pos, Inches(11.7), Inches(1.2), BG_CARD, BORDER_CARD)
         tf = c.text_frame
         tf.word_wrap = True
 
@@ -912,42 +967,37 @@ def create_presentation():
         p1.font.size = Pt(9.5)
         p1.font.color.rgb = TEXT_WHITE
 
-    s10.notes_slide.notes_text_frame.text = (
-        "Slide 10 highlights how our model maintains enterprise-grade robustness and governance. "
-        "In production workflows, failure handling must satisfy four critical architectural pillars: "
-        "First, Loop Control: infinite loops are a fatal modelling flaw. In our model, every document correction and API retry loop has an explicit limit, "
-        "after which the application either lapses or escalates. "
-        "Second, SLA Timers: both interrupting and non-interrupting timers prevent silent application stagnation. "
-        "Third, Human-in-the-Loop Fallbacks: when automated microservices fail—such as an identity API outage—the workflow gracefully routes to a human officer. "
-        "Fourth, a vital theoretical point often tested in vivas: the difference between Error Recovery and Compensation. "
-        "Recovery is forward-looking error resolution, such as retrying a failed transfer. "
-        "Compensation is backward-looking rollback of already-committed business transactions. Our model properly uses forward error recovery."
+    s12.notes_slide.notes_text_frame.text = (
+        "Slide 12 brings together our four architectural pillars of Process Robustness and Governance across both models. "
+        "First, Loop Control: infinite loops are a fatal modelling error. Both models bound every single loop construct. "
+        "Second, SLA Timers: interrupting timers enforce legal validity, while non-interrupting timers trigger operational reminders. "
+        "Third, Human-in-the-Loop Fallbacks: microservices gracefully degrade to human expert tasks when algorithms fail. "
+        "Fourth, Error Recovery versus Compensation: we demonstrate forward error recovery on banking transfers and backward compensation "
+        "logic when releasing guide reservations upon student withdrawal."
     )
 
     # ==========================================================
-    # SLIDE 11: Design Decisions and Validation
+    # SLIDE 13: Design Decisions, BPMN 2.0 Validation & Limitations
     # ==========================================================
-    s11 = prs.slides.add_slide(blank_layout)
-    apply_slide_background(s11)
-    add_header(s11, "Design Decisions, Validation & Limitations", "MODEL GOVERNANCE")
+    s13 = prs.slides.add_slide(blank_layout)
+    apply_slide_background(s13)
+    add_header(s13, "Design Decisions, Validation & Limitations", "MODEL GOVERNANCE")
 
-    # Left: Modelling Decisions & Schema Validation (5.7 in)
-    c_val = add_card(s11, Inches(0.8), Inches(1.5), Inches(5.7), Inches(5.4), BG_CARD, BORDER_CARD)
+    c_val = add_card(s13, Inches(0.8), Inches(1.5), Inches(5.7), Inches(5.4), BG_CARD, BORDER_CARD)
     tf_v = c_val.text_frame
     tf_v.word_wrap = True
 
     p = tf_v.paragraphs[0]
-    p.text = "CORE MODELLING DECISIONS & RIGOR"
+    p.text = "MODELLING RIGOR & VALIDATION PROOF"
     p.font.size = Pt(11)
     p.font.bold = True
     p.font.color.rgb = GREEN_ACCENT
     p.space_after = Pt(8)
 
     val_points = [
-        ("Strict Pool vs. Lane Boundary Discipline: ", "In BPMN 2.0, Sequence Flows can NEVER cross Pool boundaries. Because the Credit Bureau is an external legal entity, it was modelled as a separate Pool. All communication occurs strictly via Message Flows, preserving formal inter-organizational boundaries."),
-        ("Deterministic Parallel Split & Synchronized Join: ", "Avoided race conditions and token leaks by pairing the Parallel Split with an explicit Parallel Join prior to manual income verification."),
-        ("BPMN 2.0 Schema & Linter Validation: ", "The `.bpmn` XML was validated against the official OMG BPMN 2.0 XML Schema Definition (XSD). Diagram parsed and rendered cleanly in Camunda Modeler 5.49 and bpmn-js without syntax or containment errors."),
-        ("Granular Failure Typology: ", "All 12 failure modes have dedicated recovery paths or distinct terminal end states, ensuring full auditability."),
+        ("Strict Pool vs. Lane Boundary Discipline: ", "In BPMN 2.0, Sequence Flows can NEVER cross Pool boundaries. In Question 2, the external Credit Bureau is modelled as an independent Pool, and all communication uses Message Flows. In Question 1, internal lanes cleanly isolate academic roles."),
+        ("Camunda Modeler 5.49 & bpmn-js Schema Validation: ", "Both `.bpmn` files were validated against official OMG BPMN 2.0 schemas. Diagrams parsed and rendered without XML syntax errors, containment flaws, or broken sequence references."),
+        ("Deterministic Gateways: ", "Synchronized Parallel Joins prevent race conditions; Exclusive Gateways guarantee single-token determinism."),
     ]
     for t, desc in val_points:
         p_row = tf_v.add_paragraph()
@@ -962,22 +1012,21 @@ def create_presentation():
         r2.font.size = Pt(9.5)
         r2.font.color.rgb = TEXT_MUTED
 
-    # Right: Limitations & Proposed Enhancements (5.7 in)
-    c_lim = add_card(s11, Inches(6.8), Inches(1.5), Inches(5.7), Inches(5.4), BG_CARD, BORDER_CARD)
+    c_lim = add_card(s13, Inches(6.8), Inches(1.5), Inches(5.7), Inches(5.4), BG_CARD, BORDER_CARD)
     tf_l = c_lim.text_frame
     tf_l.word_wrap = True
 
     p = tf_l.paragraphs[0]
-    p.text = "HONEST LIMITATIONS & FUTURE ENHANCEMENTS"
+    p.text = "ACADEMIC LIMITATIONS & FUTURE PROPOSALS"
     p.font.size = Pt(11)
     p.font.bold = True
     p.font.color.rgb = AMBER_ACCENT
     p.space_after = Pt(8)
 
     lim_points = [
-        ("DMN Decision Table Integration: ", "Current Limitation: Eligibility and DTI scoring logic are executed inside Service Tasks.\nProposed Improvement: Extract scoring rules into standalone Decision Model and Notation (DMN) tables linked via Business Rule Tasks for business-user modifiability."),
-        ("Event Sub-Process for Global Cancellation: ", "Current Limitation: Applicant withdrawal is modelled via conditional gateway after offer review.\nProposed Improvement: Implement an Interrupting Event Sub-Process with a Message Start Event to permit applicant withdrawal at ANY active stage of the lifecycle."),
-        ("Transactional Sub-Process for Disbursement: ", "Current Limitation: Disbursement failure uses an Error Boundary Event.\nProposed Improvement: Encapsulate disbursement, ledger reservation, and notification in a Transactional Sub-Process with automated compensation."),
+        ("DMN Decision Table Expansion: ", "While Question 1 uses Business Rule Tasks for guide matching, Question 2 currently encapsulates risk scoring inside Service Tasks. Future work should extract banking scoring into external DMN decision tables."),
+        ("Global Event Sub-Processes for Cancellation: ", "Withdrawal is currently modelled at specific gateway points. Implementing an Interrupting Event Sub-Process with a Message Start Event would allow cancellation at ANY active stage in both systems."),
+        ("Transactional Sub-Processes for Disbursement: ", "Encapsulating disbursement, ledger reservation, and notification in a Transactional Sub-Process would provide atomic compensation guarantees."),
     ]
     for t, desc in lim_points:
         p_row = tf_l.add_paragraph()
@@ -992,27 +1041,23 @@ def create_presentation():
         r2.font.size = Pt(9.5)
         r2.font.color.rgb = TEXT_MUTED
 
-    s11.notes_slide.notes_text_frame.text = (
-        "Slide 11 addresses Design Decisions, Validation, and Academic Honesty regarding limitations. "
-        "A major technical achievement of this project is strict BPMN 2.0 semantic compliance: sequence flows never cross pool boundaries. "
-        "The external Credit Bureau is connected solely via message flows. We tested and validated the model XML in Camunda Modeler 5.49, "
-        "confirming that all shapes, DI coordinates, and boundary events parse without error. "
-        "Equally important in an academic presentation is discussing limitations and future improvements. "
-        "We candidly identify three enhancements: "
-        "First, migrating the hard-coded scoring logic in Service Tasks to DMN decision tables using Business Rule Tasks. "
-        "Second, adding an Event Sub-Process to allow applicant withdrawal at any active point in the lifecycle. "
-        "And third, adopting Transactional Sub-Processes with automated compensation handlers for multi-step fund reservation."
+    s13.notes_slide.notes_text_frame.text = (
+        "Slide 13 addresses Design Decisions, Tool Validation, and Academic Honesty regarding limitations. "
+        "Both models strictly conform to OMG BPMN 2.0 standards: sequence flows never cross pool boundaries, and all DI coordinates parse cleanly. "
+        "We tested both models in Camunda Modeler 5.49 and verified that all boundary events, gateways, and lane sets render without errors. "
+        "We also candidly address limitations: "
+        "we propose expanding DMN decision tables to banking risk scoring, adding Event Sub-Processes for global cancellation, "
+        "and utilizing Transactional Sub-Processes for distributed ledger compensation."
     )
 
     # ==========================================================
-    # SLIDE 12: Conclusion & Questions
+    # SLIDE 14: Conclusion & Questions
     # ==========================================================
-    s12 = prs.slides.add_slide(blank_layout)
-    apply_slide_background(s12)
-    add_header(s12, "Conclusion & Academic Summary", "PROJECT SYNTHESIS")
+    s14 = prs.slides.add_slide(blank_layout)
+    apply_slide_background(s14)
+    add_header(s14, "Conclusion & Academic Defence", "PROJECT SYNTHESIS")
 
-    # Left: Summary Card (7.0 in)
-    c_sum = add_card(s12, Inches(0.8), Inches(1.5), Inches(7.0), Inches(5.4), BG_CARD, BORDER_CARD)
+    c_sum = add_card(s14, Inches(0.8), Inches(1.5), Inches(7.0), Inches(5.4), BG_CARD, BORDER_CARD)
     tf_s = c_sum.text_frame
     tf_s.word_wrap = True
 
@@ -1024,10 +1069,10 @@ def create_presentation():
     p.space_after = Pt(10)
 
     summary_bullets = [
-        ("Comprehensive Process Coverage: ", "Successfully modelled the full retail loan origination lifecycle across 7 participants, transitioning from initial portal submission to core banking disbursement."),
-        ("Engineering for Real-World Failure: ", "Incorporated 12 distinct failure paths (L1–L12) spanning data validation, compliance, external API latency, underwriter deliberation, and transaction faults."),
-        ("Advanced BPMN 2.0 Semantics: ", "Demonstrated rigorous application of Parallel Gateways (deterministic concurrency), Exclusive Gateways (mutually exclusive routing), and both Interrupting and Non-Interrupting Boundary Events."),
-        ("Production-Ready Governance: ", "Delivered an auditable, executable BPMN 2.0 XML specification supported by detailed Failure Path Registers and Task Type Justification documentation."),
+        ("Comprehensive Dual-Domain Modelling: ", "Successfully modelled two diverse workflows—academic capstone allocation (Q1) and commercial retail lending (Q2)—demonstrating the flexibility of BPMN 2.0."),
+        ("Complete Failure Path Coverage: ", "Engineered 11 failure paths for Question 1 and 12 failure paths for Question 2, covering data validation, timeouts, policy rejections, and system faults."),
+        ("Advanced Execution Semantics: ", "Demonstrated mastery of Parallel Gateways (concurrency), Exclusive Gateways (decisions), Event-Based Gateways (competing events), and both Interrupting and Non-Interrupting Boundary Events."),
+        ("Production-Ready Engineering: ", "Delivered validated BPMN 2.0 XML files, comprehensive Failure Path Registers, and full Task/Gateway Justification documents."),
     ]
     for t, desc in summary_bullets:
         bp = tf_s.add_paragraph()
@@ -1042,8 +1087,7 @@ def create_presentation():
         r2.font.size = Pt(10)
         r2.font.color.rgb = TEXT_MUTED
 
-    # Right: Thank You & Q&A Box (4.4 in)
-    c_qa = add_card(s12, Inches(8.1), Inches(1.5), Inches(4.4), Inches(5.4), BG_CARD_ALT, CYAN_ACCENT)
+    c_qa = add_card(s14, Inches(8.1), Inches(1.5), Inches(4.4), Inches(5.4), BG_CARD_ALT, CYAN_ACCENT)
     tf_q = c_qa.text_frame
     tf_q.word_wrap = True
 
@@ -1069,18 +1113,16 @@ def create_presentation():
     pq_meta.font.size = Pt(12)
     pq_meta.font.color.rgb = TEXT_MUTED
 
-    s12.notes_slide.notes_text_frame.text = (
-        "In conclusion, our BPMN 2.0 model provides an enterprise-grade blueprint for retail loan origination that balances customer experience, "
-        "operational efficiency, and regulatory compliance. "
-        "By moving beyond standard happy-path diagrams to incorporate deterministic parallel concurrency, asynchronous external collaboration, "
-        "and 12 resilient failure handling mechanisms, the model proves the real power of BPMN 2.0 as an executable engineering standard. "
-        "Thank you, Professor and classmates, for your time and attention. I am now ready to answer any questions regarding our modeling choices, "
-        "gateway semantics, or exception architectures."
+    s14.notes_slide.notes_text_frame.text = (
+        "In conclusion, our BPMN 2.0 models demonstrate that business process modelling is an exact engineering discipline. "
+        "By examining both Question 1 (Student Project Allocation) and Question 2 (Loan Origination), we have shown how BPMN 2.0 standardizes "
+        "complex human and automated interactions, enforces regulatory and departmental governance, and builds resilience against real-world failures. "
+        "Thank you, Professor and classmates, for your time and attention. I am now open to your questions."
     )
 
     out_pptx = r"d:\BPMN\October\Presentation\BPMN_Project_Presentation.pptx"
     prs.save(out_pptx)
-    print(f"PowerPoint saved successfully to: {out_pptx}")
+    print(f"Dual-question presentation saved to: {out_pptx}")
 
 if __name__ == "__main__":
     create_presentation()
