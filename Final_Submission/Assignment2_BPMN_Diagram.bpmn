@@ -1,17 +1,9 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
-             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
-             xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
-             xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
-             xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
-             targetNamespace="http://bpmn.io/schema/bpmn"
-             exporter="BPMN Assignment Generator"
-             exporterVersion="1.0">
+<?xml version='1.0' encoding='utf-8'?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" targetNamespace="http://bpmn.io/schema/bpmn" exporter="BPMN Assignment Generator" exporterVersion="1.0">
 
-  <!-- ============================================================ -->
-  <!-- ASSIGNMENT 2: Logistics and Shipment Exception Management    -->
-  <!-- ============================================================ -->
+  
+  
+  
 
   <collaboration id="Collaboration_Assignment2">
     <participant id="Pool_Logistics" name="Logistics and Shipment Exception Management" processRef="Process_Logistics" />
@@ -95,12 +87,12 @@
       </lane>
     </laneSet>
 
-    <!-- ========== START EVENT ========== -->
+    
     <startEvent id="StartEvent_BookShipment" name="Shipper Books Shipment">
       <outgoing>SF_Start_Book</outgoing>
     </startEvent>
 
-    <!-- ========== SHIPPER LANE ========== -->
+    
     <userTask id="Task_BookShipment" name="Book Shipment and Provide Shipment Details">
       <incoming>SF_Start_Book</incoming>
       <outgoing>SF_Book_Validate</outgoing>
@@ -130,7 +122,7 @@
       <incoming>SF_Refund_End</incoming>
     </endEvent>
 
-    <!-- ========== CONTROL TOWER LANE ========== -->
+    
     <serviceTask id="Task_ValidateShipment" name="Validate Address Weight and Service Type (E2)">
       <incoming>SF_Book_Validate</incoming>
       <outgoing>SF_Validate_GW</outgoing>
@@ -208,7 +200,7 @@
       <incoming>SF_Escalate_LostEnd</incoming>
     </endEvent>
 
-    <!-- ========== PICKUP AGENT LANE ========== -->
+    
     <userTask id="Task_AssignDriver" name="Assign Pickup Driver and Route">
       <incoming>SF_Schedule_AssignDriver</incoming>
       <outgoing>SF_AssignDriver_Collect</outgoing>
@@ -259,7 +251,7 @@
       <incoming>SF_PickupMaxRetry_End</incoming>
     </endEvent>
 
-    <!-- ========== HUB LANE ========== -->
+    
     <serviceTask id="Task_HubSort" name="Hub Sorting and Scanning on Arrival">
       <incoming>SF_NoDamage_Hub</incoming>
       <outgoing>SF_HubSort_Inspect</outgoing>
@@ -328,7 +320,7 @@
       <outgoing>SF_Manual_Track</outgoing>
     </userTask>
 
-    <!-- ========== DELIVERY AGENT LANE ========== -->
+    
     <userTask id="Task_OutForDelivery" name="Mark Out for Delivery and Load Parcel">
       <incoming>SF_Track_OutDelivery</incoming>
       <outgoing>SF_OutDelivery_NotifyRecip</outgoing>
@@ -374,7 +366,7 @@
       <incoming>SF_ReturnSender_End</incoming>
     </endEvent>
 
-    <!-- ========== RECIPIENT LANE ========== -->
+    
     <sendTask id="Task_NotifyRecipient" name="Send Delivery Notification to Recipient (E7)">
       <incoming>SF_OutDelivery_NotifyRecip</incoming>
       <outgoing>SF_Notify_GW</outgoing>
@@ -401,7 +393,7 @@
       <incoming>SF_CODFail_RefuseEnd</incoming>
     </endEvent>
 
-    <!-- ========== CLAIMS LANE ========== -->
+    
     <userTask id="Task_AssessClaimDamage" name="Assess Damage or Loss Claim">
       <incoming>SF_Damage_Claims</incoming>
       <incoming>SF_Isolate_Claims</incoming>
@@ -423,7 +415,7 @@
       <incoming>SF_Settle_End</incoming>
     </endEvent>
 
-    <!-- ========== SEQUENCE FLOWS ========== -->
+    
     <sequenceFlow id="SF_Start_Book" sourceRef="StartEvent_BookShipment" targetRef="Task_BookShipment" />
     <sequenceFlow id="SF_Book_Validate" sourceRef="Task_BookShipment" targetRef="Task_ValidateShipment" />
     <sequenceFlow id="SF_Validate_GW" sourceRef="Task_ValidateShipment" targetRef="GW_ValidationOK" />
@@ -501,20 +493,20 @@
 
   </process>
 
-  <!-- Messages -->
+  
   <message id="Msg_CustomsDocs" name="CustomsDocuments" />
   <message id="Msg_CustomsClearance" name="CustomsClearance" />
 
-  <!-- ==================== BPMN DI ==================== -->
+  
   <bpmndi:BPMNDiagram id="BPMNDiagram_A2">
     <bpmndi:BPMNPlane id="BPMNPlane_A2" bpmnElement="Collaboration_Assignment2">
 
-      <!-- Pool -->
+      
       <bpmndi:BPMNShape id="Shape_Pool_A2" bpmnElement="Pool_Logistics" isHorizontal="true">
         <dc:Bounds x="100" y="40" width="2800" height="1200" />
       </bpmndi:BPMNShape>
 
-      <!-- Lanes -->
+      
       <bpmndi:BPMNShape id="Shape_Ln_Shipper" bpmnElement="Lane_Shipper" isHorizontal="true">
         <dc:Bounds x="130" y="40" width="2770" height="160" />
       </bpmndi:BPMNShape>
@@ -537,13 +529,13 @@
         <dc:Bounds x="130" y="1120" width="2770" height="120" />
       </bpmndi:BPMNShape>
 
-      <!-- START -->
+      
       <bpmndi:BPMNShape id="Shape_Start_A2" bpmnElement="StartEvent_BookShipment">
         <dc:Bounds x="182" y="101" width="36" height="36" />
         <bpmndi:BPMNLabel><dc:Bounds x="160" y="144" width="80" height="28" /></bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
 
-      <!-- Shipper tasks -->
+      
       <bpmndi:BPMNShape id="Shape_Book" bpmnElement="Task_BookShipment">
         <dc:Bounds x="268" y="79" width="140" height="80" />
       </bpmndi:BPMNShape>
@@ -566,7 +558,7 @@
         <bpmndi:BPMNLabel><dc:Bounds x="843" y="144" width="86" height="28" /></bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
 
-      <!-- Control Tower tasks -->
+      
       <bpmndi:BPMNShape id="Shape_Validate" bpmnElement="Task_ValidateShipment">
         <dc:Bounds x="268" y="259" width="140" height="80" />
       </bpmndi:BPMNShape>
@@ -618,7 +610,7 @@
         <bpmndi:BPMNLabel><dc:Bounds x="2043" y="324" width="86" height="28" /></bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
 
-      <!-- Pickup Agent tasks -->
+      
       <bpmndi:BPMNShape id="Shape_AssignDriver" bpmnElement="Task_AssignDriver">
         <dc:Bounds x="968" y="439" width="140" height="80" />
       </bpmndi:BPMNShape>
@@ -652,7 +644,7 @@
         <bpmndi:BPMNLabel><dc:Bounds x="943" y="612" width="86" height="40" /></bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
 
-      <!-- Hub tasks -->
+      
       <bpmndi:BPMNShape id="Shape_HubSort" bpmnElement="Task_HubSort">
         <dc:Bounds x="1768" y="639" width="140" height="80" />
       </bpmndi:BPMNShape>
@@ -695,7 +687,7 @@
         <dc:Bounds x="868" y="639" width="140" height="80" />
       </bpmndi:BPMNShape>
 
-      <!-- Delivery Agent tasks -->
+      
       <bpmndi:BPMNShape id="Shape_OutDeliv" bpmnElement="Task_OutForDelivery">
         <dc:Bounds x="2168" y="839" width="140" height="80" />
       </bpmndi:BPMNShape>
@@ -725,7 +717,7 @@
         <bpmndi:BPMNLabel><dc:Bounds x="2343" y="1004" width="86" height="28" /></bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
 
-      <!-- Recipient tasks -->
+      
       <bpmndi:BPMNShape id="Shape_NotifyRecip" bpmnElement="Task_NotifyRecipient">
         <dc:Bounds x="2268" y="1039" width="140" height="80" />
       </bpmndi:BPMNShape>
@@ -745,7 +737,7 @@
         <bpmndi:BPMNLabel><dc:Bounds x="2643" y="1104" width="86" height="40" /></bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
 
-      <!-- Claims tasks -->
+      
       <bpmndi:BPMNShape id="Shape_AssessClaim" bpmnElement="Task_AssessClaimDamage">
         <dc:Bounds x="1868" y="1149" width="140" height="80" />
       </bpmndi:BPMNShape>
@@ -760,6 +752,6 @@
         <bpmndi:BPMNLabel><dc:Bounds x="2443" y="1214" width="86" height="28" /></bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
 
-    </bpmndi:BPMNPlane>
+    <bpmndi:BPMNEdge id="BPMNEdge_SF_Start_Book" bpmnElement="SF_Start_Book"><di:waypoint x="218" y="119" /><di:waypoint x="268" y="119" /></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_Book_Validate" bpmnElement="SF_Book_Validate"><di:waypoint x="338" y="159" /><di:waypoint x="338" y="259" /></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_Validate_GW" bpmnElement="SF_Validate_GW"><di:waypoint x="408" y="299" /><di:waypoint x="458" y="304" /></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_Valid_Charges" bpmnElement="SF_Valid_Charges"><di:waypoint x="508" y="304" /><di:waypoint x="568" y="299" /><bpmndi:BPMNLabel><dc:Bounds x="518" y="283" width="60" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_Invalid_Return" bpmnElement="SF_Invalid_Return"><di:waypoint x="483" y="279" /><di:waypoint x="483" y="34" /><di:waypoint x="338" y="34" /><di:waypoint x="338" y="79" /><bpmndi:BPMNLabel><dc:Bounds x="390" y="16" width="60" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_Charges_Schedule" bpmnElement="SF_Charges_Schedule"><di:waypoint x="708" y="299" /><di:waypoint x="768" y="299" /></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_Schedule_AssignDriver" bpmnElement="SF_Schedule_AssignDriver"><di:waypoint x="908" y="299" /><di:waypoint x="938" y="299" /><di:waypoint x="938" y="479" /><di:waypoint x="968" y="479" /></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_AssignDriver_Collect" bpmnElement="SF_AssignDriver_Collect"><di:waypoint x="1108" y="479" /><di:waypoint x="1168" y="479" /></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_Collect_GW" bpmnElement="SF_Collect_GW"><di:waypoint x="1308" y="479" /><di:waypoint x="1358" y="484" /></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_PickupOK_DamageCheck" bpmnElement="SF_PickupOK_DamageCheck"><di:waypoint x="1408" y="484" /><di:waypoint x="1468" y="479" /><bpmndi:BPMNLabel><dc:Bounds x="1418" y="463" width="60" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_PickupFail_Reschedule" bpmnElement="SF_PickupFail_Reschedule"><di:waypoint x="1383" y="509" /><di:waypoint x="1383" y="674" /><di:waypoint x="1238" y="674" /><di:waypoint x="1238" y="629" /><bpmndi:BPMNLabel><dc:Bounds x="1290" y="656" width="60" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_Reschedule_Retry" bpmnElement="SF_Reschedule_Retry"><di:waypoint x="1238" y="629" /><di:waypoint x="1238" y="674" /><di:waypoint x="1093" y="674" /><di:waypoint x="1093" y="619" /></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_RetryOK_Collect" bpmnElement="SF_RetryOK_Collect"><di:waypoint x="1118" y="594" /><di:waypoint x="1143" y="594" /><di:waypoint x="1143" y="479" /><di:waypoint x="1168" y="479" /><bpmndi:BPMNLabel><dc:Bounds x="1123" y="518" width="60" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_RetryFail_End" bpmnElement="SF_RetryFail_End"><di:waypoint x="1093" y="569" /><di:waypoint x="1093" y="524" /><di:waypoint x="986" y="524" /><di:waypoint x="986" y="571" /><bpmndi:BPMNLabel><dc:Bounds x="1019" y="506" width="60" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_PickupMaxRetry_End" bpmnElement="SF_PickupMaxRetry_End"><di:waypoint x="1238" y="537" /><di:waypoint x="1238" y="647" /><di:waypoint x="986" y="647" /><di:waypoint x="986" y="607" /><bpmndi:BPMNLabel><dc:Bounds x="1092" y="629" width="60" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_DamageReport_GW" bpmnElement="SF_DamageReport_GW"><di:waypoint x="1608" y="479" /><di:waypoint x="1658" y="484" /></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_NoDamage_Hub" bpmnElement="SF_NoDamage_Hub"><di:waypoint x="1708" y="484" /><di:waypoint x="1738" y="484" /><di:waypoint x="1738" y="679" /><di:waypoint x="1768" y="679" /><bpmndi:BPMNLabel><dc:Bounds x="1718" y="563" width="60" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_Damage_Claims" bpmnElement="SF_Damage_Claims"><di:waypoint x="1708" y="484" /><di:waypoint x="1788" y="484" /><di:waypoint x="1788" y="1189" /><di:waypoint x="1868" y="1189" /><bpmndi:BPMNLabel><dc:Bounds x="1768" y="818" width="60" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_HubSort_Inspect" bpmnElement="SF_HubSort_Inspect"><di:waypoint x="1908" y="679" /><di:waypoint x="1968" y="679" /></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_Inspect_GW" bpmnElement="SF_Inspect_GW"><di:waypoint x="2108" y="679" /><di:waypoint x="2158" y="684" /></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_ConditionOK_Customs" bpmnElement="SF_ConditionOK_Customs"><di:waypoint x="2183" y="659" /><di:waypoint x="2183" y="594" /><di:waypoint x="1638" y="594" /><di:waypoint x="1638" y="639" /><bpmndi:BPMNLabel><dc:Bounds x="1890" y="576" width="60" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_ConditionFail_Isolate" bpmnElement="SF_ConditionFail_Isolate"><di:waypoint x="2208" y="684" /><di:waypoint x="2258" y="679" /><bpmndi:BPMNLabel><dc:Bounds x="2213" y="663" width="60" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_Isolate_Claims" bpmnElement="SF_Isolate_Claims"><di:waypoint x="2328" y="719" /><di:waypoint x="2328" y="1274" /><di:waypoint x="1938" y="1274" /><di:waypoint x="1938" y="1229" /></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_CustomsHold_GW" bpmnElement="SF_CustomsHold_GW"><di:waypoint x="1638" y="719" /><di:waypoint x="1638" y="764" /><di:waypoint x="1493" y="764" /><di:waypoint x="1493" y="709" /></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_CustomsNo_LineHaul" bpmnElement="SF_CustomsNo_LineHaul"><di:waypoint x="1493" y="659" /><di:waypoint x="1493" y="594" /><di:waypoint x="1338" y="594" /><di:waypoint x="1338" y="639" /><bpmndi:BPMNLabel><dc:Bounds x="1395" y="576" width="60" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_CustomsYes_Hold" bpmnElement="SF_CustomsYes_Hold"><di:waypoint x="1518" y="684" /><di:waypoint x="1668" y="679" /><bpmndi:BPMNLabel><dc:Bounds x="1573" y="663" width="60" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_CustomsHold_WaitDocs" bpmnElement="SF_CustomsHold_WaitDocs"><di:waypoint x="1704" y="679" /><di:waypoint x="1736" y="679" /><di:waypoint x="1736" y="119" /><di:waypoint x="1768" y="119" /></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_CustomsDocs_Provide" bpmnElement="SF_CustomsDocs_Provide"><di:waypoint x="1804" y="119" /><di:waypoint x="1858" y="119" /></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_CustomsDocs_Submitted" bpmnElement="SF_CustomsDocs_Submitted"><di:waypoint x="1928" y="159" /><di:waypoint x="1928" y="742" /><di:waypoint x="1686" y="742" /><di:waypoint x="1686" y="697" /></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_CustomsClear_LineHaul" bpmnElement="SF_CustomsClear_LineHaul"><di:waypoint x="1686" y="697" /><di:waypoint x="1686" y="754" /><di:waypoint x="1393" y="754" /><di:waypoint x="1393" y="709" /></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_Cleared_LineHaul" bpmnElement="SF_Cleared_LineHaul"><di:waypoint x="1418" y="684" /><di:waypoint x="1268" y="679" /><bpmndi:BPMNLabel><dc:Bounds x="1323" y="663" width="60" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_NotCleared_Hold" bpmnElement="SF_NotCleared_Hold"><di:waypoint x="1418" y="684" /><di:waypoint x="1568" y="679" /><bpmndi:BPMNLabel><dc:Bounds x="1473" y="663" width="60" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_LineHaul_ScanCheck" bpmnElement="SF_LineHaul_ScanCheck"><di:waypoint x="1338" y="639" /><di:waypoint x="1338" y="594" /><di:waypoint x="1138" y="594" /><di:waypoint x="1138" y="639" /></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_ScanGap_GW" bpmnElement="SF_ScanGap_GW"><di:waypoint x="1138" y="719" /><di:waypoint x="1138" y="764" /><di:waypoint x="993" y="764" /><di:waypoint x="993" y="709" /></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_ScanOK_Track" bpmnElement="SF_ScanOK_Track"><di:waypoint x="1018" y="684" /><di:waypoint x="1543" y="684" /><di:waypoint x="1543" y="299" /><di:waypoint x="2068" y="299" /><bpmndi:BPMNLabel><dc:Bounds x="1523" y="473" width="60" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_ScanFail_Manual" bpmnElement="SF_ScanFail_Manual"><di:waypoint x="1018" y="684" /><di:waypoint x="868" y="679" /><bpmndi:BPMNLabel><dc:Bounds x="923" y="663" width="60" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_ScanLost_Trace" bpmnElement="SF_ScanLost_Trace"><di:waypoint x="1018" y="684" /><di:waypoint x="1343" y="684" /><di:waypoint x="1343" y="299" /><di:waypoint x="1668" y="299" /><bpmndi:BPMNLabel><dc:Bounds x="1323" y="473" width="60" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_Manual_Track" bpmnElement="SF_Manual_Track"><di:waypoint x="1008" y="679" /><di:waypoint x="1538" y="679" /><di:waypoint x="1538" y="299" /><di:waypoint x="2068" y="299" /></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_LineHaul_Track" bpmnElement="SF_LineHaul_Track"><di:waypoint x="1208" y="679" /><di:waypoint x="1638" y="679" /><di:waypoint x="1638" y="299" /><di:waypoint x="2068" y="299" /></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_TransitDelay_Handle" bpmnElement="SF_TransitDelay_Handle"><di:waypoint x="2138" y="357" /><di:waypoint x="2138" y="299" /><di:waypoint x="2268" y="299" /><bpmndi:BPMNLabel><dc:Bounds x="2118" y="310" width="60" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_TransitDelay_Notify" bpmnElement="SF_TransitDelay_Notify"><di:waypoint x="2338" y="259" /><di:waypoint x="2338" y="214" /><di:waypoint x="2138" y="214" /><di:waypoint x="2138" y="259" /></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_Track_OutDelivery" bpmnElement="SF_Track_OutDelivery"><di:waypoint x="2208" y="299" /><di:waypoint x="2188" y="299" /><di:waypoint x="2188" y="879" /><di:waypoint x="2168" y="879" /></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_OutDelivery_NotifyRecip" bpmnElement="SF_OutDelivery_NotifyRecip"><di:waypoint x="2308" y="879" /><di:waypoint x="2288" y="879" /><di:waypoint x="2288" y="1079" /><di:waypoint x="2268" y="1079" /></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_Notify_GW" bpmnElement="SF_Notify_GW"><di:waypoint x="2408" y="1079" /><di:waypoint x="2468" y="1084" /></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_RecipAvail_Deliver" bpmnElement="SF_RecipAvail_Deliver"><di:waypoint x="2493" y="1059" /><di:waypoint x="2493" y="989" /><di:waypoint x="2538" y="989" /><di:waypoint x="2538" y="919" /><bpmndi:BPMNLabel><dc:Bounds x="2495" y="971" width="60" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_RecipUnavail_COD" bpmnElement="SF_RecipUnavail_COD"><di:waypoint x="2518" y="1084" /><di:waypoint x="2568" y="1084" /><bpmndi:BPMNLabel><dc:Bounds x="2523" y="1066" width="60" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_CODOk_Deliver" bpmnElement="SF_CODOk_Deliver"><di:waypoint x="2593" y="1059" /><di:waypoint x="2593" y="989" /><di:waypoint x="2538" y="989" /><di:waypoint x="2538" y="919" /><bpmndi:BPMNLabel><dc:Bounds x="2545" y="971" width="60" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_CODFail_Refuse" bpmnElement="SF_CODFail_Refuse"><di:waypoint x="2593" y="1059" /><di:waypoint x="2593" y="894" /><di:waypoint x="2238" y="894" /><di:waypoint x="2238" y="939" /><bpmndi:BPMNLabel><dc:Bounds x="2395" y="876" width="60" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_CODFail_RefuseEnd" bpmnElement="SF_CODFail_RefuseEnd"><di:waypoint x="2618" y="1084" /><di:waypoint x="2668" y="1079" /></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_Deliver_GW" bpmnElement="SF_Deliver_GW"><di:waypoint x="2608" y="879" /><di:waypoint x="2668" y="884" /></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_DeliverOK_POD" bpmnElement="SF_DeliverOK_POD"><di:waypoint x="2693" y="909" /><di:waypoint x="2693" y="974" /><di:waypoint x="2738" y="974" /><di:waypoint x="2738" y="1039" /><bpmndi:BPMNLabel><dc:Bounds x="2695" y="956" width="60" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_DeliverFail_Return" bpmnElement="SF_DeliverFail_Return"><di:waypoint x="2693" y="859" /><di:waypoint x="2693" y="794" /><di:waypoint x="2438" y="794" /><di:waypoint x="2438" y="839" /><bpmndi:BPMNLabel><dc:Bounds x="2545" y="776" width="60" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_DeliveryTimeout_Return" bpmnElement="SF_DeliveryTimeout_Return"><di:waypoint x="2538" y="937" /><di:waypoint x="2538" y="977" /><di:waypoint x="2438" y="977" /><di:waypoint x="2438" y="919" /><bpmndi:BPMNLabel><dc:Bounds x="2468" y="959" width="60" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_ReturnDepot_GW" bpmnElement="SF_ReturnDepot_GW"><di:waypoint x="2438" y="919" /><di:waypoint x="2438" y="964" /><di:waypoint x="2293" y="964" /><di:waypoint x="2293" y="909" /></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_RetryDeliv_Reschedule" bpmnElement="SF_RetryDeliv_Reschedule"><di:waypoint x="2293" y="909" /><di:waypoint x="2293" y="974" /><di:waypoint x="2338" y="974" /><di:waypoint x="2338" y="1039" /><bpmndi:BPMNLabel><dc:Bounds x="2295" y="956" width="60" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_NoRetry_ReturnSender" bpmnElement="SF_NoRetry_ReturnSender"><di:waypoint x="2293" y="909" /><di:waypoint x="2293" y="924" /><di:waypoint x="2238" y="924" /><di:waypoint x="2238" y="939" /><bpmndi:BPMNLabel><dc:Bounds x="2245" y="906" width="60" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_RefuseReturnSender" bpmnElement="SF_RefuseReturnSender"><di:waypoint x="2308" y="979" /><di:waypoint x="2168" y="979" /></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_ReturnSender_End" bpmnElement="SF_ReturnSender_End"><di:waypoint x="2308" y="979" /><di:waypoint x="2368" y="979" /></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_POD_Close" bpmnElement="SF_POD_Close"><di:waypoint x="2738" y="1039" /><di:waypoint x="2738" y="214" /><di:waypoint x="2538" y="214" /><di:waypoint x="2538" y="259" /></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_Close_Delivered" bpmnElement="SF_Close_Delivered"><di:waypoint x="2608" y="299" /><di:waypoint x="2668" y="299" /></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_Trace_Escalate" bpmnElement="SF_Trace_Escalate"><di:waypoint x="1808" y="299" /><di:waypoint x="1868" y="299" /></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_Escalate_Claims" bpmnElement="SF_Escalate_Claims"><di:waypoint x="1938" y="339" /><di:waypoint x="1938" y="1149" /></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_Escalate_LostEnd" bpmnElement="SF_Escalate_LostEnd"><di:waypoint x="2008" y="299" /><di:waypoint x="2068" y="299" /></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_Lost_Trace" bpmnElement="SF_Lost_Trace"><di:waypoint x="1018" y="684" /><di:waypoint x="1343" y="684" /><di:waypoint x="1343" y="299" /><di:waypoint x="1668" y="299" /></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_Assess_Process" bpmnElement="SF_Assess_Process"><di:waypoint x="2008" y="1189" /><di:waypoint x="2068" y="1189" /></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_Process_Settle" bpmnElement="SF_Process_Settle"><di:waypoint x="2208" y="1189" /><di:waypoint x="2268" y="1189" /></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_Settle_End" bpmnElement="SF_Settle_End"><di:waypoint x="2408" y="1189" /><di:waypoint x="2468" y="1189" /></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_CancelRequest" bpmnElement="SF_CancelRequest"><di:waypoint x="408" y="119" /><di:waypoint x="468" y="119" /></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_Cancel_Process" bpmnElement="SF_Cancel_Process"><di:waypoint x="608" y="119" /><di:waypoint x="588" y="119" /><di:waypoint x="588" y="299" /><di:waypoint x="568" y="299" /></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_ProcessCancel_GW" bpmnElement="SF_ProcessCancel_GW"><di:waypoint x="708" y="299" /><di:waypoint x="718" y="304" /></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_CancelOK_Refund" bpmnElement="SF_CancelOK_Refund"><di:waypoint x="768" y="304" /><di:waypoint x="768" y="299" /><bpmndi:BPMNLabel><dc:Bounds x="748" y="283" width="60" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_CancelFail_Dispatch" bpmnElement="SF_CancelFail_Dispatch"><di:waypoint x="768" y="304" /><di:waypoint x="2068" y="299" /><bpmndi:BPMNLabel><dc:Bounds x="1398" y="283" width="60" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_Refund_End" bpmnElement="SF_Refund_End"><di:waypoint x="838" y="259" /><di:waypoint x="838" y="198" /><di:waypoint x="886" y="198" /><di:waypoint x="886" y="137" /></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_ProcessCancel_End" bpmnElement="SF_ProcessCancel_End"><di:waypoint x="638" y="259" /><di:waypoint x="638" y="198" /><di:waypoint x="686" y="198" /><di:waypoint x="686" y="137" /></bpmndi:BPMNEdge></bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
 </definitions>

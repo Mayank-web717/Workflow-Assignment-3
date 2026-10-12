@@ -1,29 +1,21 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
-             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
-             xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
-             xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
-             xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
-             targetNamespace="http://bpmn.io/schema/bpmn"
-             exporter="BPMN Assignment Generator"
-             exporterVersion="1.0">
+<?xml version='1.0' encoding='utf-8'?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" targetNamespace="http://bpmn.io/schema/bpmn" exporter="BPMN Assignment Generator" exporterVersion="1.0">
 
-  <!-- ============================================================ -->
-  <!-- ASSIGNMENT 3: Loan Origination and Approval System          -->
-  <!-- ============================================================ -->
+  
+  
+  
 
   <collaboration id="Collaboration_Assignment3">
-    <!-- Main Bank Pool -->
+    
     <participant id="Pool_Bank" name="Loan Origination and Approval System" processRef="Process_Loan" />
-    <!-- External Credit Bureau Pool -->
+    
     <participant id="Pool_CreditBureau" name="Credit Bureau (External)" processRef="Process_CreditBureau" />
-    <!-- Message flow between bank and credit bureau -->
+    
     <messageFlow id="MF_LoanToCredit" name="Credit Report Request" sourceRef="Task_RequestCreditBureau" targetRef="Pool_CreditBureau" />
     <messageFlow id="MF_CreditToLoan" name="Credit Report Response" sourceRef="Pool_CreditBureau" targetRef="IntermediateCatch_CreditReport" />
   </collaboration>
 
-  <!-- ========== EXTERNAL: Credit Bureau Process ========== -->
+  
   <process id="Process_CreditBureau" name="Credit Bureau" isExecutable="false">
     <startEvent id="SubStart_CB" name="Receive Credit Report Request">
       <outgoing>SF_CB_Start_Process</outgoing>
@@ -41,7 +33,7 @@
     <sequenceFlow id="SF_CB_Send" sourceRef="Task_CB_GenerateReport" targetRef="SubEnd_CB" />
   </process>
 
-  <!-- ========== MAIN BANK PROCESS ========== -->
+  
   <process id="Process_Loan" name="Loan Origination and Approval System" isExecutable="true">
 
     <laneSet id="LaneSet_Loan">
@@ -112,12 +104,12 @@
       </lane>
     </laneSet>
 
-    <!-- ========== START EVENT ========== -->
+    
     <startEvent id="StartEvent_ApplyLoan" name="Applicant Submits Loan Application and Supporting Documents">
       <outgoing>SF_Start_Submit</outgoing>
     </startEvent>
 
-    <!-- ========== APPLICANT LANE ========== -->
+    
     <userTask id="Task_SubmitApplication" name="Submit Loan Application Form and Upload Documents">
       <incoming>SF_Start_Submit</incoming>
       <outgoing>SF_Submit_DocCheck</outgoing>
@@ -177,7 +169,7 @@
       <incoming>SF_OfferTimeout_Expired</incoming>
     </endEvent>
 
-    <!-- ========== LOAN OFFICER LANE ========== -->
+    
     <serviceTask id="Task_CheckDocCompleteness" name="Check Document Completeness and Format (L1)">
       <incoming>SF_Submit_DocCheck</incoming>
       <incoming>SF_Correct_DocCheck</incoming>
@@ -251,7 +243,7 @@
       <incoming>SF_DocLapsed_End</incoming>
     </endEvent>
 
-    <!-- ========== UNDERWRITER LANE ========== -->
+    
     <userTask id="Task_UnderwriterReview" name="Underwriter Full Manual Review - High Value or Borderline Case (L7)">
       <incoming>SF_ManualReview_Underwriter</incoming>
       <incoming>SF_ReUnderwrite_Review</incoming>
@@ -281,7 +273,7 @@
       <outgoing>SF_ReUnderwrite_Review</outgoing>
     </userTask>
 
-    <!-- ========== FRAUD AND COMPLIANCE LANE ========== -->
+    
     <serviceTask id="Task_KYCVerification" name="KYC Identity Verification (L2)">
       <incoming>SF_ParallelSplit_KYC</incoming>
       <outgoing>SF_KYC_GW</outgoing>
@@ -320,7 +312,7 @@
       <incoming>SF_KYCFail_End</incoming>
     </endEvent>
 
-    <!-- ========== CORE BANKING SYSTEM LANE ========== -->
+    
     <parallelGateway id="GW_ParallelSplit" name="Start Parallel Verification Checks">
       <incoming>SF_DocOK_ParallelSplit</incoming>
       <outgoing>SF_ParallelSplit_KYC</outgoing>
@@ -370,7 +362,7 @@
       <outgoing>SF_ParallelJoin_Income</outgoing>
     </parallelGateway>
 
-    <!-- ========== OPERATIONS LANE ========== -->
+    
     <userTask id="Task_PrepareDisbursement" name="Prepare Disbursement Instructions and Verify Account Details">
       <incoming>SF_ESign_Disburse</incoming>
       <incoming>SF_ESignTimeout_Manual</incoming>
@@ -414,12 +406,12 @@
       <errorEventDefinition id="ErrDef_DisburseFail" errorRef="Err_DisbursementFail" />
     </endEvent>
 
-    <!-- ========== SEQUENCE FLOWS ========== -->
-    <!-- Start -->
+    
+    
     <sequenceFlow id="SF_Start_Submit" sourceRef="StartEvent_ApplyLoan" targetRef="Task_SubmitApplication" />
     <sequenceFlow id="SF_Submit_DocCheck" sourceRef="Task_SubmitApplication" targetRef="Task_CheckDocCompleteness" />
 
-    <!-- Document Check (L1) -->
+    
     <sequenceFlow id="SF_DocCheck_GW" sourceRef="Task_CheckDocCompleteness" targetRef="GW_DocComplete" />
     <sequenceFlow id="SF_DocOK_ParallelSplit" name="Documents Complete" sourceRef="GW_DocComplete" targetRef="GW_ParallelSplit" />
     <sequenceFlow id="SF_DocIncomplete_Return" name="Incomplete (L1)" sourceRef="GW_DocComplete" targetRef="Task_ReturnIncomplete" />
@@ -427,40 +419,40 @@
     <sequenceFlow id="SF_Correct_DocCheck" sourceRef="Task_CorrectDocuments" targetRef="Task_CheckDocCompleteness" />
     <sequenceFlow id="SF_DocLapsed_End" name="No Response - Lapsed (L1)" sourceRef="Task_ReturnIncomplete" targetRef="EndEvent_ApplicationLapsed" />
 
-    <!-- Parallel Split -->
+    
     <sequenceFlow id="SF_ParallelSplit_KYC" sourceRef="GW_ParallelSplit" targetRef="Task_KYCVerification" />
     <sequenceFlow id="SF_ParallelSplit_CreditBureau" sourceRef="GW_ParallelSplit" targetRef="Task_RequestCreditBureau" />
     <sequenceFlow id="SF_ParallelSplit_IncomeDTI" sourceRef="GW_ParallelSplit" targetRef="Task_IncomeDTICheck" />
 
-    <!-- KYC (L2) -->
+    
     <sequenceFlow id="SF_KYC_GW" sourceRef="Task_KYCVerification" targetRef="GW_KYCResult" />
     <sequenceFlow id="SF_KYCPass_AML" name="KYC Passed" sourceRef="GW_KYCResult" targetRef="Task_AMLScreening" />
     <sequenceFlow id="SF_KYCFail_Manual" name="KYC Failed - Manual Review (L2)" sourceRef="GW_KYCResult" targetRef="Task_ManualKYC" />
     <sequenceFlow id="SF_KYCFail_End" name="KYC Unresolvable" sourceRef="GW_KYCResult" targetRef="EndEvent_FraudTerminated" />
     <sequenceFlow id="SF_ManualKYC_AML" sourceRef="Task_ManualKYC" targetRef="Task_AMLScreening" />
 
-    <!-- AML / Fraud (L3) -->
+    
     <sequenceFlow id="SF_AML_GW" sourceRef="Task_AMLScreening" targetRef="GW_AMLResult" />
     <sequenceFlow id="SF_AMLPass_Join" name="AML Passed" sourceRef="GW_AMLResult" targetRef="GW_ParallelJoin" />
     <sequenceFlow id="SF_AMLFail_Investigate" name="AML Flag (L3)" sourceRef="GW_AMLResult" targetRef="Task_FraudInvestigation" />
     <sequenceFlow id="SF_FraudInv_End" sourceRef="Task_FraudInvestigation" targetRef="EndEvent_FraudTerminated" />
 
-    <!-- Credit Bureau (L4) -->
+    
     <sequenceFlow id="SF_CreditRequest_Catch" sourceRef="Task_RequestCreditBureau" targetRef="IntermediateCatch_CreditReport" />
     <sequenceFlow id="SF_CreditReport_GW" sourceRef="IntermediateCatch_CreditReport" targetRef="GW_CreditScoreOK" />
     <sequenceFlow id="SF_CreditTimeout_Retry" name="Bureau Timeout (L4)" sourceRef="BoundaryTimer_CreditBureauTimeout" targetRef="Task_RequestCreditBureau" />
     <sequenceFlow id="SF_CreditOK_Join" name="Credit Score OK" sourceRef="GW_CreditScoreOK" targetRef="GW_ParallelJoin" />
     <sequenceFlow id="SF_CreditFail_Join" name="Credit Score Low (L5)" sourceRef="GW_CreditScoreOK" targetRef="GW_ParallelJoin" />
 
-    <!-- Income/DTI (L6) -->
+    
     <sequenceFlow id="SF_IncomeDTI_GW" sourceRef="Task_IncomeDTICheck" targetRef="GW_DTIResult" />
     <sequenceFlow id="SF_DTIOk_Join" name="DTI Acceptable" sourceRef="GW_DTIResult" targetRef="GW_ParallelJoin" />
     <sequenceFlow id="SF_DTIFail_End" name="DTI Too High (L6)" sourceRef="GW_DTIResult" targetRef="EndEvent_Rejected" />
 
-    <!-- Parallel Join -->
+    
     <sequenceFlow id="SF_ParallelJoin_Income" sourceRef="GW_ParallelJoin" targetRef="Task_VerifyIncome" />
 
-    <!-- Income Verification and Eligibility -->
+    
     <sequenceFlow id="SF_IncomeDTI_VerifyIncome" sourceRef="GW_ParallelJoin" targetRef="Task_VerifyIncome" />
     <sequenceFlow id="SF_VerifyIncome_Eligibility" sourceRef="Task_VerifyIncome" targetRef="Task_CalculateEligibility" />
     <sequenceFlow id="SF_Eligibility_GW" sourceRef="Task_CalculateEligibility" targetRef="GW_EligibilityScore" />
@@ -468,7 +460,7 @@
     <sequenceFlow id="SF_ManualReview_Underwriter" name="Manual Review - High Risk (L7)" sourceRef="GW_EligibilityScore" targetRef="Task_UnderwriterReview" />
     <sequenceFlow id="SF_Reject_End" name="Rejected (L5/L6)" sourceRef="GW_EligibilityScore" targetRef="EndEvent_Rejected" />
 
-    <!-- Underwriter (L7/L8) -->
+    
     <sequenceFlow id="SF_Underwriter_Decision" sourceRef="Task_UnderwriterReview" targetRef="GW_UnderwriterDecision" />
     <sequenceFlow id="SF_Underwriter_Approve" name="Approved" sourceRef="GW_UnderwriterDecision" targetRef="Task_GenerateLoanOffer" />
     <sequenceFlow id="SF_Underwriter_Collateral" name="Requires Collateral (L8)" sourceRef="GW_UnderwriterDecision" targetRef="Task_RequestCollateral" />
@@ -478,7 +470,7 @@
     <sequenceFlow id="SF_CollateralFail_ReUnderwrite" name="Collateral Insufficient" sourceRef="GW_CollateralOK" targetRef="Task_ReUnderwrite" />
     <sequenceFlow id="SF_ReUnderwrite_Review" sourceRef="Task_ReUnderwrite" targetRef="Task_UnderwriterReview" />
 
-    <!-- Offer (L9) -->
+    
     <sequenceFlow id="SF_GenerateOffer_Send" sourceRef="Task_GenerateLoanOffer" targetRef="Task_SendOffer" />
     <sequenceFlow id="SF_Offer_ReviewOffer" sourceRef="Task_SendOffer" targetRef="Task_ReviewOffer" />
     <sequenceFlow id="SF_ReviewOffer_Decision" sourceRef="Task_ReviewOffer" targetRef="GW_OfferDecision" />
@@ -491,14 +483,14 @@
     <sequenceFlow id="SF_CounterReject_Reject" name="Bank Rejects Counter" sourceRef="GW_CounterOfferDecision" targetRef="EndEvent_Rejected" />
     <sequenceFlow id="SF_FinalizeAgreement_ESign" sourceRef="Task_FinalizeAgreement" targetRef="Task_ESignAgreement" />
 
-    <!-- E-Sign (L11) -->
+    
     <sequenceFlow id="SF_ESign_Disburse" sourceRef="Task_ESignAgreement" targetRef="Task_PrepareDisbursement" />
     <sequenceFlow id="SF_ESignTimeout_Manual" name="E-Sign Timeout - Manual Intervention (L11)" sourceRef="BoundaryTimer_ESignTimeout" targetRef="Task_PrepareDisbursement" />
 
-    <!-- Withdrawal (L10) -->
+    
     <sequenceFlow id="SF_WithdrawApp_End" sourceRef="Task_WithdrawApplication" targetRef="EndEvent_Withdrawn" />
 
-    <!-- Disbursement (L12) -->
+    
     <sequenceFlow id="SF_PrepareDisbursement_Disburse" sourceRef="Task_PrepareDisbursement" targetRef="Task_DisburseFunds" />
     <sequenceFlow id="SF_Disburse_CreateAccount" sourceRef="Task_DisburseFunds" targetRef="Task_CreateLoanAccount" />
     <sequenceFlow id="SF_DisburseFail_Retry" name="Disbursement Error (L12)" sourceRef="BoundaryError_DisbursementFail" targetRef="Task_RetryDisbursement" />
@@ -510,23 +502,23 @@
 
   </process>
 
-  <!-- ========== MESSAGES ========== -->
+  
   <message id="Msg_CreditRequest" name="CreditReportRequest" />
   <message id="Msg_CreditReport" name="CreditReportResponse" />
 
-  <!-- ========== ERRORS ========== -->
+  
   <error id="Err_DisbursementFail" name="DisbursementFailureError" errorCode="DISBURSE_FAIL" />
 
-  <!-- ==================== BPMN DI ==================== -->
+  
   <bpmndi:BPMNDiagram id="BPMNDiagram_A3">
     <bpmndi:BPMNPlane id="BPMNPlane_A3" bpmnElement="Collaboration_Assignment3">
 
-      <!-- External Credit Bureau Pool -->
+      
       <bpmndi:BPMNShape id="Shape_Pool_CB" bpmnElement="Pool_CreditBureau" isHorizontal="true">
         <dc:Bounds x="100" y="40" width="2900" height="120" />
       </bpmndi:BPMNShape>
 
-      <!-- Credit Bureau shapes -->
+      
       <bpmndi:BPMNShape id="Shape_CB_Start" bpmnElement="SubStart_CB">
         <dc:Bounds x="1582" y="82" width="36" height="36" />
         <bpmndi:BPMNLabel><dc:Bounds x="1558" y="125" width="84" height="28" /></bpmndi:BPMNLabel>
@@ -539,12 +531,12 @@
         <bpmndi:BPMNLabel><dc:Bounds x="1834" y="125" width="84" height="28" /></bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
 
-      <!-- Main Bank Pool -->
+      
       <bpmndi:BPMNShape id="Shape_Pool_Bank" bpmnElement="Pool_Bank" isHorizontal="true">
         <dc:Bounds x="100" y="180" width="2900" height="1300" />
       </bpmndi:BPMNShape>
 
-      <!-- Lanes -->
+      
       <bpmndi:BPMNShape id="Shape_Ln_Applicant" bpmnElement="Lane_Applicant" isHorizontal="true">
         <dc:Bounds x="130" y="180" width="2870" height="180" />
       </bpmndi:BPMNShape>
@@ -564,13 +556,13 @@
         <dc:Bounds x="130" y="1140" width="2870" height="340" />
       </bpmndi:BPMNShape>
 
-      <!-- START -->
+      
       <bpmndi:BPMNShape id="Shape_Start_A3" bpmnElement="StartEvent_ApplyLoan">
         <dc:Bounds x="182" y="251" width="36" height="36" />
         <bpmndi:BPMNLabel><dc:Bounds x="156" y="294" width="88" height="40" /></bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
 
-      <!-- Applicant Lane -->
+      
       <bpmndi:BPMNShape id="Shape_SubmitApp" bpmnElement="Task_SubmitApplication">
         <dc:Bounds x="268" y="229" width="140" height="80" />
       </bpmndi:BPMNShape>
@@ -611,7 +603,7 @@
         <bpmndi:BPMNLabel><dc:Bounds x="2443" y="234" width="86" height="28" /></bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
 
-      <!-- Loan Officer Lane -->
+      
       <bpmndi:BPMNShape id="Shape_CheckDoc" bpmnElement="Task_CheckDocCompleteness">
         <dc:Bounds x="668" y="419" width="140" height="80" />
       </bpmndi:BPMNShape>
@@ -657,7 +649,7 @@
         <bpmndi:BPMNLabel><dc:Bounds x="343" y="502" width="86" height="28" /></bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
 
-      <!-- Underwriter Lane -->
+      
       <bpmndi:BPMNShape id="Shape_Underwriter" bpmnElement="Task_UnderwriterReview">
         <dc:Bounds x="2068" y="619" width="140" height="80" />
       </bpmndi:BPMNShape>
@@ -676,7 +668,7 @@
         <dc:Bounds x="2668" y="619" width="140" height="80" />
       </bpmndi:BPMNShape>
 
-      <!-- Fraud Lane -->
+      
       <bpmndi:BPMNShape id="Shape_KYC" bpmnElement="Task_KYCVerification">
         <dc:Bounds x="1068" y="799" width="140" height="80" />
       </bpmndi:BPMNShape>
@@ -702,7 +694,7 @@
         <bpmndi:BPMNLabel><dc:Bounds x="2043" y="864" width="86" height="40" /></bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
 
-      <!-- Core Banking Lane -->
+      
       <bpmndi:BPMNShape id="Shape_GW_ParSplit" bpmnElement="GW_ParallelSplit">
         <dc:Bounds x="968" y="999" width="50" height="50" />
         <bpmndi:BPMNLabel><dc:Bounds x="948" y="1054" width="90" height="28" /></bpmndi:BPMNLabel>
@@ -734,7 +726,7 @@
         <bpmndi:BPMNLabel><dc:Bounds x="2048" y="1074" width="90" height="28" /></bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
 
-      <!-- Operations Lane -->
+      
       <bpmndi:BPMNShape id="Shape_PrepDisburse" bpmnElement="Task_PrepareDisbursement">
         <dc:Bounds x="2668" y="1199" width="140" height="80" />
       </bpmndi:BPMNShape>
@@ -763,7 +755,7 @@
         <bpmndi:BPMNLabel><dc:Bounds x="1938" y="1382" width="96" height="40" /></bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
 
-      <!-- Message Flows (DI) -->
+      
       <bpmndi:BPMNEdge id="Edge_MF_LoanToCredit" bpmnElement="MF_LoanToCredit">
         <di:waypoint x="1638" y="979" /><di:waypoint x="1638" y="160" />
       </bpmndi:BPMNEdge>
@@ -771,6 +763,6 @@
         <di:waypoint x="1894" y="118" /><di:waypoint x="1786" y="1001" />
       </bpmndi:BPMNEdge>
 
-    </bpmndi:BPMNPlane>
+    <bpmndi:BPMNEdge id="BPMNEdge_SF_CB_Start_Process" bpmnElement="SF_CB_Start_Process"><di:waypoint x="1618" y="100" /><di:waypoint x="1668" y="100" /></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_CB_Send" bpmnElement="SF_CB_Send"><di:waypoint x="1808" y="100" /><di:waypoint x="1858" y="100" /></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_Start_Submit" bpmnElement="SF_Start_Submit"><di:waypoint x="218" y="269" /><di:waypoint x="268" y="269" /></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_Submit_DocCheck" bpmnElement="SF_Submit_DocCheck"><di:waypoint x="408" y="269" /><di:waypoint x="538" y="269" /><di:waypoint x="538" y="459" /><di:waypoint x="668" y="459" /></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_DocCheck_GW" bpmnElement="SF_DocCheck_GW"><di:waypoint x="808" y="459" /><di:waypoint x="858" y="464" /></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_DocOK_ParallelSplit" bpmnElement="SF_DocOK_ParallelSplit"><di:waypoint x="908" y="464" /><di:waypoint x="938" y="464" /><di:waypoint x="938" y="1024" /><di:waypoint x="968" y="1024" /><bpmndi:BPMNLabel><dc:Bounds x="918" y="726" width="60" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_DocIncomplete_Return" bpmnElement="SF_DocIncomplete_Return"><di:waypoint x="883" y="439" /><di:waypoint x="883" y="374" /><di:waypoint x="538" y="374" /><di:waypoint x="538" y="419" /><bpmndi:BPMNLabel><dc:Bounds x="690" y="356" width="60" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_DocIncomplete_Correct" bpmnElement="SF_DocIncomplete_Correct"><di:waypoint x="538" y="419" /><di:waypoint x="538" y="309" /></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_Correct_DocCheck" bpmnElement="SF_Correct_DocCheck"><di:waypoint x="608" y="269" /><di:waypoint x="638" y="269" /><di:waypoint x="638" y="459" /><di:waypoint x="668" y="459" /></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_DocLapsed_End" bpmnElement="SF_DocLapsed_End"><di:waypoint x="538" y="499" /><di:waypoint x="538" y="544" /><di:waypoint x="386" y="544" /><di:waypoint x="386" y="497" /><bpmndi:BPMNLabel><dc:Bounds x="442" y="526" width="60" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_ParallelSplit_KYC" bpmnElement="SF_ParallelSplit_KYC"><di:waypoint x="1018" y="1024" /><di:waypoint x="1043" y="1024" /><di:waypoint x="1043" y="839" /><di:waypoint x="1068" y="839" /></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_ParallelSplit_CreditBureau" bpmnElement="SF_ParallelSplit_CreditBureau"><di:waypoint x="1018" y="1024" /><di:waypoint x="1568" y="1019" /></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_ParallelSplit_IncomeDTI" bpmnElement="SF_ParallelSplit_IncomeDTI"><di:waypoint x="1018" y="1024" /><di:waypoint x="1068" y="1019" /></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_KYC_GW" bpmnElement="SF_KYC_GW"><di:waypoint x="1208" y="839" /><di:waypoint x="1258" y="844" /></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_KYCPass_AML" bpmnElement="SF_KYCPass_AML"><di:waypoint x="1308" y="844" /><di:waypoint x="1568" y="839" /><bpmndi:BPMNLabel><dc:Bounds x="1418" y="823" width="60" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_KYCFail_Manual" bpmnElement="SF_KYCFail_Manual"><di:waypoint x="1308" y="844" /><di:waypoint x="1358" y="839" /><bpmndi:BPMNLabel><dc:Bounds x="1313" y="823" width="60" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_KYCFail_End" bpmnElement="SF_KYCFail_End"><di:waypoint x="1308" y="844" /><di:waypoint x="2068" y="839" /><bpmndi:BPMNLabel><dc:Bounds x="1668" y="823" width="60" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_ManualKYC_AML" bpmnElement="SF_ManualKYC_AML"><di:waypoint x="1498" y="839" /><di:waypoint x="1568" y="839" /></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_AML_GW" bpmnElement="SF_AML_GW"><di:waypoint x="1708" y="839" /><di:waypoint x="1758" y="844" /></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_AMLPass_Join" bpmnElement="SF_AMLPass_Join"><di:waypoint x="1808" y="844" /><di:waypoint x="1938" y="844" /><di:waypoint x="1938" y="1044" /><di:waypoint x="2068" y="1044" /><bpmndi:BPMNLabel><dc:Bounds x="1918" y="926" width="60" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_AMLFail_Investigate" bpmnElement="SF_AMLFail_Investigate"><di:waypoint x="1808" y="844" /><di:waypoint x="1868" y="839" /><bpmndi:BPMNLabel><dc:Bounds x="1818" y="823" width="60" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_FraudInv_End" bpmnElement="SF_FraudInv_End"><di:waypoint x="2008" y="839" /><di:waypoint x="2068" y="839" /></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_CreditRequest_Catch" bpmnElement="SF_CreditRequest_Catch"><di:waypoint x="1708" y="1019" /><di:waypoint x="1768" y="1019" /></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_CreditReport_GW" bpmnElement="SF_CreditReport_GW"><di:waypoint x="1804" y="1019" /><di:waypoint x="1831" y="1019" /><di:waypoint x="1831" y="1044" /><di:waypoint x="1858" y="1044" /></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_CreditTimeout_Retry" bpmnElement="SF_CreditTimeout_Retry"><di:waypoint x="1638" y="1077" /><di:waypoint x="1638" y="1019" /><di:waypoint x="1568" y="1019" /><bpmndi:BPMNLabel><dc:Bounds x="1618" y="1030" width="60" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_CreditOK_Join" bpmnElement="SF_CreditOK_Join"><di:waypoint x="1908" y="1044" /><di:waypoint x="2068" y="1044" /><bpmndi:BPMNLabel><dc:Bounds x="1968" y="1026" width="60" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_CreditFail_Join" bpmnElement="SF_CreditFail_Join"><di:waypoint x="1908" y="1044" /><di:waypoint x="2068" y="1044" /><bpmndi:BPMNLabel><dc:Bounds x="1968" y="1026" width="60" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_IncomeDTI_GW" bpmnElement="SF_IncomeDTI_GW"><di:waypoint x="1208" y="1019" /><di:waypoint x="1258" y="1024" /></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_DTIOk_Join" bpmnElement="SF_DTIOk_Join"><di:waypoint x="1308" y="1024" /><di:waypoint x="1688" y="1024" /><di:waypoint x="1688" y="1044" /><di:waypoint x="2068" y="1044" /><bpmndi:BPMNLabel><dc:Bounds x="1668" y="1016" width="60" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_DTIFail_End" bpmnElement="SF_DTIFail_End"><di:waypoint x="1308" y="1024" /><di:waypoint x="1688" y="1024" /><di:waypoint x="1688" y="499" /><di:waypoint x="2068" y="499" /><bpmndi:BPMNLabel><dc:Bounds x="1668" y="743" width="60" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_ParallelJoin_Income" bpmnElement="SF_ParallelJoin_Income"><di:waypoint x="2093" y="1019" /><di:waypoint x="2093" y="374" /><di:waypoint x="1638" y="374" /><di:waypoint x="1638" y="419" /></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_IncomeDTI_VerifyIncome" bpmnElement="SF_IncomeDTI_VerifyIncome"><di:waypoint x="2093" y="1019" /><di:waypoint x="2093" y="374" /><di:waypoint x="1638" y="374" /><di:waypoint x="1638" y="419" /></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_VerifyIncome_Eligibility" bpmnElement="SF_VerifyIncome_Eligibility"><di:waypoint x="1708" y="459" /><di:waypoint x="1768" y="459" /></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_Eligibility_GW" bpmnElement="SF_Eligibility_GW"><di:waypoint x="1908" y="459" /><di:waypoint x="1958" y="464" /></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_AutoApprove_Offer" bpmnElement="SF_AutoApprove_Offer"><di:waypoint x="2008" y="464" /><di:waypoint x="2068" y="459" /><bpmndi:BPMNLabel><dc:Bounds x="2018" y="443" width="60" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_ManualReview_Underwriter" bpmnElement="SF_ManualReview_Underwriter"><di:waypoint x="2008" y="464" /><di:waypoint x="2038" y="464" /><di:waypoint x="2038" y="659" /><di:waypoint x="2068" y="659" /><bpmndi:BPMNLabel><dc:Bounds x="2018" y="543" width="60" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_Reject_End" bpmnElement="SF_Reject_End"><di:waypoint x="2008" y="464" /><di:waypoint x="2038" y="464" /><di:waypoint x="2038" y="499" /><di:waypoint x="2068" y="499" /><bpmndi:BPMNLabel><dc:Bounds x="2018" y="463" width="60" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_Underwriter_Decision" bpmnElement="SF_Underwriter_Decision"><di:waypoint x="2208" y="659" /><di:waypoint x="2268" y="664" /></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_Underwriter_Approve" bpmnElement="SF_Underwriter_Approve"><di:waypoint x="2293" y="639" /><di:waypoint x="2293" y="374" /><di:waypoint x="2138" y="374" /><di:waypoint x="2138" y="419" /><bpmndi:BPMNLabel><dc:Bounds x="2195" y="356" width="60" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_Underwriter_Collateral" bpmnElement="SF_Underwriter_Collateral"><di:waypoint x="2318" y="664" /><di:waypoint x="2368" y="659" /><bpmndi:BPMNLabel><dc:Bounds x="2323" y="643" width="60" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_UnderwriterReject" bpmnElement="SF_UnderwriterReject"><di:waypoint x="2293" y="639" /><di:waypoint x="2293" y="436" /><di:waypoint x="2086" y="436" /><di:waypoint x="2086" y="481" /><bpmndi:BPMNLabel><dc:Bounds x="2169" y="418" width="60" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_Collateral_GW" bpmnElement="SF_Collateral_GW"><di:waypoint x="2508" y="659" /><di:waypoint x="2568" y="664" /></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_CollateralOK_Approve" bpmnElement="SF_CollateralOK_Approve"><di:waypoint x="2593" y="639" /><di:waypoint x="2593" y="374" /><di:waypoint x="2138" y="374" /><di:waypoint x="2138" y="419" /><bpmndi:BPMNLabel><dc:Bounds x="2345" y="356" width="60" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_CollateralFail_ReUnderwrite" bpmnElement="SF_CollateralFail_ReUnderwrite"><di:waypoint x="2618" y="664" /><di:waypoint x="2668" y="659" /><bpmndi:BPMNLabel><dc:Bounds x="2623" y="643" width="60" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_ReUnderwrite_Review" bpmnElement="SF_ReUnderwrite_Review"><di:waypoint x="2738" y="619" /><di:waypoint x="2738" y="574" /><di:waypoint x="2138" y="574" /><di:waypoint x="2138" y="619" /></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_GenerateOffer_Send" bpmnElement="SF_GenerateOffer_Send"><di:waypoint x="2208" y="459" /><di:waypoint x="2268" y="459" /></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_Offer_ReviewOffer" bpmnElement="SF_Offer_ReviewOffer"><di:waypoint x="2338" y="419" /><di:waypoint x="2338" y="309" /></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_ReviewOffer_Decision" bpmnElement="SF_ReviewOffer_Decision"><di:waypoint x="2408" y="269" /><di:waypoint x="2458" y="274" /></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_Accept_ESign" bpmnElement="SF_Accept_ESign"><di:waypoint x="2508" y="274" /><di:waypoint x="2568" y="269" /><bpmndi:BPMNLabel><dc:Bounds x="2518" y="253" width="60" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_Counter_CounterOffer" bpmnElement="SF_Counter_CounterOffer"><di:waypoint x="2508" y="274" /><di:waypoint x="2538" y="274" /><di:waypoint x="2538" y="459" /><di:waypoint x="2568" y="459" /><bpmndi:BPMNLabel><dc:Bounds x="2518" y="348" width="60" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_Withdraw_Loan" bpmnElement="SF_Withdraw_Loan"><di:waypoint x="2508" y="274" /><di:waypoint x="2538" y="274" /><di:waypoint x="2538" y="209" /><di:waypoint x="2568" y="209" /><bpmndi:BPMNLabel><dc:Bounds x="2518" y="223" width="60" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_OfferTimeout_Expired" bpmnElement="SF_OfferTimeout_Expired"><di:waypoint x="2338" y="327" /><di:waypoint x="2338" y="209" /><di:waypoint x="2468" y="209" /><bpmndi:BPMNLabel><dc:Bounds x="2318" y="250" width="60" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_Counter_GW" bpmnElement="SF_Counter_GW"><di:waypoint x="2708" y="459" /><di:waypoint x="2758" y="464" /></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_CounterAccept_NewOffer" bpmnElement="SF_CounterAccept_NewOffer"><di:waypoint x="2783" y="439" /><di:waypoint x="2783" y="439" /><di:waypoint x="2838" y="439" /><di:waypoint x="2838" y="439" /><bpmndi:BPMNLabel><dc:Bounds x="2790" y="421" width="60" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_CounterReject_Reject" bpmnElement="SF_CounterReject_Reject"><di:waypoint x="2783" y="489" /><di:waypoint x="2783" y="562" /><di:waypoint x="2086" y="562" /><di:waypoint x="2086" y="517" /><bpmndi:BPMNLabel><dc:Bounds x="2414" y="544" width="60" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_FinalizeAgreement_ESign" bpmnElement="SF_FinalizeAgreement_ESign"><di:waypoint x="2838" y="359" /><di:waypoint x="2838" y="184" /><di:waypoint x="2638" y="184" /><di:waypoint x="2638" y="229" /></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_ESign_Disburse" bpmnElement="SF_ESign_Disburse"><di:waypoint x="2708" y="269" /><di:waypoint x="2688" y="269" /><di:waypoint x="2688" y="1239" /><di:waypoint x="2668" y="1239" /></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_ESignTimeout_Manual" bpmnElement="SF_ESignTimeout_Manual"><di:waypoint x="2638" y="327" /><di:waypoint x="2638" y="1239" /><di:waypoint x="2668" y="1239" /><bpmndi:BPMNLabel><dc:Bounds x="2618" y="765" width="60" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_WithdrawApp_End" bpmnElement="SF_WithdrawApp_End"><di:waypoint x="2708" y="209" /><di:waypoint x="2768" y="209" /></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_PrepareDisbursement_Disburse" bpmnElement="SF_PrepareDisbursement_Disburse"><di:waypoint x="2738" y="1199" /><di:waypoint x="2738" y="1154" /><di:waypoint x="2438" y="1154" /><di:waypoint x="2438" y="1199" /></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_Disburse_CreateAccount" bpmnElement="SF_Disburse_CreateAccount"><di:waypoint x="2438" y="1199" /><di:waypoint x="2438" y="1154" /><di:waypoint x="2238" y="1154" /><di:waypoint x="2238" y="1199" /></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_DisburseFail_Retry" bpmnElement="SF_DisburseFail_Retry"><di:waypoint x="2438" y="1297" /><di:waypoint x="2438" y="1419" /><di:waypoint x="2238" y="1419" /><di:waypoint x="2238" y="1379" /><bpmndi:BPMNLabel><dc:Bounds x="2318" y="1401" width="60" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_RetryDisburse_GW" bpmnElement="SF_RetryDisburse_GW"><di:waypoint x="2238" y="1379" /><di:waypoint x="2238" y="1424" /><di:waypoint x="2093" y="1424" /><di:waypoint x="2093" y="1369" /></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_DisburseRetryOK_Account" bpmnElement="SF_DisburseRetryOK_Account"><di:waypoint x="2118" y="1344" /><di:waypoint x="2143" y="1344" /><di:waypoint x="2143" y="1239" /><di:waypoint x="2168" y="1239" /><bpmndi:BPMNLabel><dc:Bounds x="2123" y="1273" width="60" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_DisburseRetryFail_End" bpmnElement="SF_DisburseRetryFail_End"><di:waypoint x="2093" y="1369" /><di:waypoint x="2093" y="1422" /><di:waypoint x="1986" y="1422" /><di:waypoint x="1986" y="1377" /><bpmndi:BPMNLabel><dc:Bounds x="2019" y="1404" width="60" height="14" /></bpmndi:BPMNLabel></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_CreateAccount_Notify" bpmnElement="SF_CreateAccount_Notify"><di:waypoint x="2308" y="1239" /><di:waypoint x="2568" y="1239" /></bpmndi:BPMNEdge><bpmndi:BPMNEdge id="BPMNEdge_SF_NotifyApplicant_Success" bpmnElement="SF_NotifyApplicant_Success"><di:waypoint x="2708" y="1239" /><di:waypoint x="2788" y="1239" /><di:waypoint x="2788" y="269" /><di:waypoint x="2868" y="269" /></bpmndi:BPMNEdge></bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
 </definitions>
